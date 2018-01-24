@@ -1,0 +1,27 @@
+{
+  "name": "postgoose",
+  "version": "1.0.0",
+  "description": "Postgresql handler like mongoose",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aluzed/postgoose.git"
+  },
+  "keywords": [
+    "postgresql",
+    "mongoose"
+  ],
+  "author": "Alexandre PENOMBRE",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aluzed/postgoose/issues"
+  },
+  "homepage": "https://github.com/aluzed/postgoose#readme",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "pg": "^7.4.1"
+  }
+}
