@@ -21,31 +21,24 @@ const Promise = require('bluebird');
 module.exports = (table, id) => {
     
     let tmpQuery = 'DELETE FROM ' + table.toLowerCase() + ' WHERE id = ' + id;
-    
-    let preCallback = null;
-    let postCallback = null;
-    
+        
     function exec(callback) {
         return new Promise((resolve, reject) => {
-            if (preCallback !== null) {
-                preCallback(resolve);
-            }
-            else resolve();
-        }).then(() => {
-            return new Promise((resolve, reject) => {
-                const query = new Query();
-                query
-                    .run(tmpQuery)
-                    .then(result => {
-                        if (postCallback !== null) {
-                            postCallback(response.results);
-                        }
-                        !!callback ? callback(null, response.results) : resolve(response.results);
-                    })
-                    .catch(err => {
-                        !!callback ? callback(err) : reject(err);
-                    })
-            });
+            const query = new Query();
+            return query
+                .run(tmpQuery)
+                .then(result => {
+                    return resolve(response.results);
+                })
+                .catch(err => {
+                    return reject(err);
+                })
         });
     }
+
+    const removeObject = {
+        exec
+    };
+
+    return removeObject
 }

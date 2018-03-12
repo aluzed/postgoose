@@ -45,13 +45,13 @@ module.exports = (table, schemaPaths) => {
   return new Promise((resolve, reject) => {
     const query = new Query();
   
-    query
+    return query
       .run(tmpQuery)
       .then(response => {
-        resolve(true);
+        return resolve(true);
       })
       .catch(err => {
-        reject(err);
+        return reject(err);
       })
   });
 };

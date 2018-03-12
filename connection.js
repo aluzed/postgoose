@@ -1,4 +1,5 @@
 const { Client } = require('pg');
+const Promise = require('bluebird');
 let currentConnection = null;
 let dbConf = null;
 
@@ -24,11 +25,14 @@ module.exports = {
      * @param {Object} dbConfig : { host: "...", user: "...", password: "..." }
      */
     connect: (dbConfig) => {
-      if (!currentConnection) {
-        currentConnection = new Client(dbConfig);
-        dbConf = dbConfig;
-        currentConnection.connect();
-      }
+      return new Promise((resolve, reject) => {
+        if (!currentConnection) {
+          currentConnection = new Client(dbConfig);
+          dbConf = dbConfig;
+          currentConnection.connect();
+          return resolve();
+        }
+      });
     },
     /**
      * Disconnect the socket

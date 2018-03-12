@@ -10,8 +10,8 @@ const path         = require('path');
 const Query        = require('./query');
 const dateHelpers  = require(path.join(__dirname, '..', 'helpers', 'dates'));
 const Promise      = require('bluebird');
-const { GetModel } = require(path.join(__dirname, '..', 'model'));
 const Types        = require(path.join(__dirname, '..', 'schema', 'types'));
+const { GetModel } = require(path.join(__dirname, '..', 'model', 'model-collection'));
 
 /**
  * Insert a new row
@@ -23,70 +23,108 @@ const Types        = require(path.join(__dirname, '..', 'schema', 'types'));
  * @return {Promise}
  */
 module.exports = (table, model) => {
-  const _schema = model.schema.paths;
+  const _schema = model.__proto__.schema.paths;
   let tmpQuery = "INSERT INTO " + table.toLowerCase() + " (";
   let tmpFields = "";
   let tmpValues = "";
 
-  for (let field in _schema) {
+  let preCallback = null;
+  let postCallback = null;
 
-    // Check validators 
-    for (let v in _schema[field].validators) {
-      let currentValidator = _schema[field].validators[v];
+  /**
+   * Execute the query, if there are hooks, execute them too.
+   *
+   * @function exec
+   *
+   * @param {Function} callback (err, results) => {...}
+   * @return {Promise}
+   */
+  function exec() {
+    return new Promise((resolve, reject) => {
 
-      if (!currentValidator.validator(model[field])) {
-        throw new Error(currentValidator.message);
-      }
-    }
+      return new Promise((res, rej) => {
+        if(!!preCallback) {
+          preCallback = preCallback.bind(model);
+          return preCallback(res);
+        }
+        else res();
+      })
+      .then(() => {
+        let query = new Query();
 
-    let value = (typeof model[field] !== "undefined") ? model[field] : null;
-    
-    // Default Value
-    if(typeof _schema[field].defaultValue !== "undefined" && value === null) {
-      if(typeof _schema[field].defaultValue === "function") 
-        value = _schema[field].defaultValue();
-      else 
-        value = _schema[field].defaultValue;
-    }
-  
-    // Only if the field exists in the model table
-    if(!!_schema[field] && field !== "id") {
-      if (tmpFields !== "") {
-        tmpFields += ", ";
-      }
+        for (let field in _schema) {
 
-      tmpFields += table.toLowerCase() + "." + field;
+          // Check validators 
+          for (let v in _schema[field].validators) {
+            let currentValidator = _schema[field].validators[v];
 
-      if (tmpValues !== "") {
-        tmpValues += ", ";
-      }
+            if (!currentValidator.validator(model[field])) {
+              throw new Error(currentValidator.message);
+            }
+          }
 
-      let currentInstance = _schema[field].instance;
+          let value = (typeof model[field] !== "undefined") ? model[field] : null;
 
-      // Convert JS to DB
-      tmpValues = table.toLowerCase() + '.' + field + "=\'" + Types[currentInstance].toDB(value) + "\'";
-    }
-  }
+          // Default Value
+          if (typeof _schema[field].defaultValue !== "undefined" && value === null)  {
+            if (typeof _schema[field].defaultValue === "function")
+              value = _schema[field].defaultValue();
+            else
+              value = _schema[field].default;
+          }
 
-  tmpQuery += tmpFields + ") VALUES (" + tmpValues + ");";
+          // Only if the field exists in the model table
+          if (!!_schema[field] && field !== "id" && (!!model[field] || !!value)) {
+            if (tmpFields !== "") {
+              tmpFields += ", ";
+            }
 
-  return new Promise((resolve, reject) => {
-    let query = new Query();
-    query.exec(tmpQuery)
-      .then(response => {
-        if (!!response.results.insertId) {
-          query.exec(`SELECT * FROM ${table.toLowerCase()} WHERE ${table}.id = ${response.results.insertId};`)
-          .then(res => {
-            let item = new GetModel(table)(res.results[0]);
-            resolve(item);
+            tmpFields += field;
+
+            if (tmpValues !== "") {
+              tmpValues += ", ";
+            }
+
+            let currentInstance = _schema[field].instance;
+
+            // Convert JS to DB
+            tmpValues += "\'" + Types[currentInstance].toDB(value) + "\'";
+          }
+        }
+
+        tmpQuery += tmpFields + ") VALUES (" + tmpValues + ") RETURNING *;";
+
+        return query.run(tmpQuery)
+          .then(response => {
+            if (response.results.rows.length > 0) {
+              let itemModel = GetModel(table);
+              let item = new itemModel(response.results.rows[0]);
+
+              if (!!postCallback) {
+                postCallback = postCallback.bind(item);
+                postCallback(item);
+              }
+
+              return resolve(item);
+            }
           })
           .catch(err => {
-            reject(err);
+            return reject(err);
           });
-        }
       })
-      .catch(err => {
-        reject(err);
-      });
-  });
+     
+    });
+  }
+  
+  const insertObject = {
+    exec,
+    _pre: callback => {
+      preCallback = callback;
+    },
+    _post: callback => {
+      postCallback = callback;
+    }
+  };
+
+  return insertObject;
 };

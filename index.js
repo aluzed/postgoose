@@ -7,12 +7,15 @@
  */
 const { Schema }     = require('./schema');
 const Query          = require('./queries/query');
-const { Connection } = require('./connection');
+const { 
+  Connection, 
+  ConnectionErrors } = require('./connection');
 const {
-  SetModel,
   GetModel,
   GetModels,
-  ModelErrors }      = require('./model');
+  ModelErrors }      = require('./model/model-collection');
+const PostgooseModel = require('./model/postgoose-model');
+let _dbConfig        = null;
 
 const PostGoose = {
   /**
@@ -22,9 +25,14 @@ const PostGoose = {
    *
    * @param {Object} dbConfig : { host: "...", user: "...", password: "..." }
    */
-  connect: (dbConfig) => {
+  connect: (dbConfig, callback) => {
+    _dbConfig = dbConfig;
+
     // If there is no connection
-    Connection.connect(dbConfig);
+    if(!!callback)
+      return Connection.connect(dbConfig).then(() => callback());
+    else 
+      return Connection.connect(dbConfig);
   },
   /**
    * Set or Get a model, like in mongoose
@@ -42,12 +50,12 @@ const PostGoose = {
     }
 
     // Add to models
-    return SetModel(name, schema);
+    return PostgooseModel(name, schema);
   },
   // List of models
   models: GetModels(),
   // display local dbConfig
-  _dbConfig: Connection.getConfig(),
+  _dbConfig,
   // Get Schema class
   Schema,
   /**
@@ -55,13 +63,14 @@ const PostGoose = {
    *
    * @function runOnce
    *
-   * @param {Object} dbConfig
-   * @param {String} queryStr
+   * @param {Object} dbConfig Database config
+   * @param {String} queryStr Query string
+   * @param {Function} callback (err, results) => {...}
    * @return {Promise}
    * @throws {ConnectionNotInitialized}
    */
-  runOnce: (dbConfig, queryStr) => {
-    if (!PostGoose._dbConfig) throw new Error(localErrors.ConnectionNotInitialized);
+  runOnce: (dbConfig, queryStr, callback) => {
+    if (!PostGoose._dbConfig) throw new Error(ConnectionErrors.ConnectionNotInitialized);
 
     let query = new Query();
 
@@ -69,11 +78,11 @@ const PostGoose = {
       query.run(queryStr)
         .then((res) => {
           currentConnection.end();
-          resolve(res);
+          return !!callback ? callback(null, res) : resolve(res);
         })
         .catch(err => {
           currentConnection.end();
-          reject(err);
+          return !!callback ? callback(err) : reject(err);
         });
     })
   },
@@ -82,22 +91,23 @@ const PostGoose = {
    *
    * @function run
    *
-   * @param {String} queryStr
+   * @param {String} queryStr Query string
+   * @param {Function} callback (err, results) => {...}
    * @return {Promise}
    * @throws {ConnectionNotInitialized}
    */
-  run: (queryStr) => {
-    if (!PostGoose._dbConfig) throw new Error(localErrors.ConnectionNotInitialized);
+  run: (queryStr, callback) => {
+    if (!_dbConfig) throw new Error(ConnectionErrors.ConnectionNotInitialized);
 
     let query = new Query();
 
     return new Promise((resolve, reject) => {
       query.run(queryStr)
         .then((res) => {
-          resolve(res);
+          return !!callback ? callback(null, res) : resolve(res);
         })
         .catch(err => {
-          reject(err);
+          return !!callback ? callback(err) : reject(err);
         });
     })
   },
@@ -108,7 +118,10 @@ const PostGoose = {
      * @function connection.close
      *
      */
-    close: () => Connection.disconnect()
+    close: () => {
+      _dbConfig = null;
+      Connection.disconnect();
+    }
   }
 }
 

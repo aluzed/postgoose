@@ -4,7 +4,7 @@
   "description": "Postgresql handler like mongoose",
   "main": "index.js",
   "scripts": {
-    "test"      : "node ./node_modules/mocha/bin/_mocha ./tests/index.js",
+    "test"      : "node ./node_modules/mocha/bin/_mocha ./tests/index.js --exit",
     "dev:stats" : "find . -name '*.js' -not -path './node_modules/*' -not -path './public/*' | xargs wc -l"
   },
   "repository": {

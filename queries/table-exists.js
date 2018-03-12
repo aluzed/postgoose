@@ -25,15 +25,15 @@ module.exports = (table) => {
   return new Promise((resolve, reject) => {
     const query = new Query();
   
-    query
+    return query
       .run(tmpQuery)
       .then(response => {
-        resolve(
-          response.results.rows.find(r => r.tablename === table.toLowerCase()) 
+        return resolve(response.results.rows.find(r => 
+          r.tablename === table.toLowerCase())
         );
       })
       .catch(err => {
-        reject(err);
+        return reject(err);
       });
   });
 }

@@ -6,18 +6,19 @@
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
 */
-const Insert       = require('../queries/insert');
-const Update       = require('../queries/update');
-const Remove       = require('../queries/remove');
-const Select       = require('../queries/select');
-const SelectOne    = require('../queries/select-one');
-const Query        = require('../queries/query');
-const Promise      = require('bluebird');
 const path         = require('path');
+const Promise      = require('bluebird');
+const Insert       = require(path.join(__dirname, '..', 'queries', 'insert'));
+const Update       = require(path.join(__dirname, '..', 'queries', 'update'));
+const Remove       = require(path.join(__dirname, '..', 'queries', 'remove'));
+const Select       = require(path.join(__dirname, '..', 'queries', 'select'));
+const SelectOne    = require(path.join(__dirname, '..', 'queries', 'select-one'));
+const Query        = require(path.join(__dirname, '..', 'queries', 'query'));
 const Types        = require(path.join(__dirname, '..', 'schema', 'types'));
 const TableExists  = require(path.join(__dirname, '..', 'queries', 'table-exists'));
 const CreateTable  = require(path.join(__dirname, '..', 'queries', 'create-table'));
 const CheckColumns = require(path.join(__dirname, '..', 'queries', 'check-columns'));
+const ModelCollection = require(path.join(__dirname, 'model-collection'));
 
 /**
  * localErrors
@@ -33,6 +34,13 @@ const localErrors = {
   SchemaPathsHasChanged : 'Error, schema paths has changed please delete the table to refresh it or use old schema'
 };
 
+const forbiddenColumns = [
+  'schema',
+  'save',
+  'update',
+  'remove'
+];
+
 module.exports = (table, schema) => {
 
   let tmpClass = class PostgooseModel {
@@ -44,14 +52,9 @@ module.exports = (table, schema) => {
     */
     constructor(modelObject) {
       this.id = null;
+
       this.__proto__.schema = schema;
       this.__proto__.table = table;
-
-      this.__proto__._setValues = (values) => {
-        for (let field in values) {
-          this[field] = values[field];
-        }
-      };
 
       // assign pre hooks
       if (!!this.__proto__.schema.hooks.pre.init) {
@@ -69,9 +72,16 @@ module.exports = (table, schema) => {
         }
       }
 
+      // Set deep object values
+      this.__proto__._setValues = (values) => {
+        for (let field in values) {
+          this[field] = values[field];
+        }
+      };
+
       // Fields
       for (let field in modelObject) {
-        if(field === 'schema')
+        if (forbiddenColumns.indexOf(field) > -1)
           throw new Error(localErrors.ForbiddenColumnName);
 
         this[field] = modelObject[field];
@@ -81,24 +91,11 @@ module.exports = (table, schema) => {
       for (let i in schema.methods) {
         let method = schema.methods[i];
 
-        if(typeof method === "function") {
+        if (typeof method === "function") {
           this[i] = method;
           this[i] = this[i].bind(this);
         }
       }
-
-      // Check if table exists
-      TableExists(table).then(tableExists => {
-        if(!tableExists)
-          CreateTable(table, this.__proto__.schema.paths);
-        else {
-          CheckColumns(table, this.__proto__.schema.paths)
-            .then(schemaChanged => {
-              if(schemaChanged.changed === true)
-                throw new Error(localErrors.SchemaPathsHasChanged);
-            })
-        }
-      });
     }
 
     valuesToDB() {
@@ -405,39 +402,30 @@ module.exports = (table, schema) => {
      * @constraint this.id must be undefined
      * @throws {ModelAlreadyPersisted}
      */
-    create(callback)  {
+    static create(item, callback)  {
       const Self = this;
 
       if (typeof Self.id !== "undefined")
         throw new Error(localErrors.ModelAlreadyPersisted);
 
-      if (!Self.id)
+      if (!!Self.id)
         throw new Error(localErrors.ItemExists);
 
-      return new Promise((resolve, reject) => {
-        // If has pre hook, exec the callback first
-        if (!!Self.__proto__.schema.hooks.pre.create) {
-          Self.__proto__.schema.hooks.pre.create(resolve);
-        }
-        else {
-          // Or resolve
-          resolve();
-        }
-      })
-        .then(() => {
-          return new Promise((resolve, reject) => {
-            Insert(Self.__proto__.table, this).then(item => {
-              // If there is a hook after save
-              if (!!this.__proto__.schema.hooks.post.create)
-                this.__proto__.schema.hooks.post.create(item);
+      let model = new Self(item);
 
-              return (!!callback) ? callback(null, item) : resolve(item);
-            })
-              .catch(err => {
-                return (!!callback) ? callback(err) : reject(err);
-              })
-          });
+      let inserObj = Insert(Self.__proto__.table, model);
+
+      inserObj._pre = Self.__proto__.schema.hooks.pre.create;
+      inserObj._post = Self.__proto__.schema.hooks.post.create;
+
+      return new Promise((resolve, reject) => {
+        return inserObj.exec().then(row => {
+          return (!!callback) ? callback(null, row) : resolve(row);
+        })
+        .catch(err => {
+          return (!!callback) ? callback(err) : reject(err);
         });
+      })
     }
 
     /**
@@ -580,10 +568,43 @@ module.exports = (table, schema) => {
     }
   }
 
+  tmpClass.__proto__.schema = schema;
+  tmpClass.__proto__.table = table;
+
+  // assign pre hooks
+  if (!!tmpClass.__proto__.schema.hooks.pre.init) {
+    const val = tmpClass.__proto__.schema.hooks.pre.init(tmpClass);
+    for (let field in val) {
+      tmpClass[field] = val[field];
+    }
+  }
+
+  // assign  post hooks
+  if (!!tmpClass.__proto__.schema.hooks.post.init) {
+    const val = tmpClass.__proto__.schema.hooks.post.init(tmpClass);
+    for (let field in val) {
+      tmpClass[field] = val[field];
+    }
+  }
+
+  // Check if table exists
+  TableExists(table).then(tableExists => {
+    if (!tableExists)
+      CreateTable(table, tmpClass.__proto__.schema.paths);
+    else {
+      CheckColumns(table, tmpClass.__proto__.schema.paths)
+        .then(schemaChanged => {
+          if (schemaChanged.changed === true)
+            throw new Error(localErrors.SchemaPathsHasChanged);
+        })
+    }
+  });
+
   // Bind static methods
   for (let i in schema.statics) {
     tmpClass.__proto__[i] = schema.statics[i];
   }
 
-  return tmpClass;
+  // Add new model in model collection
+  return ModelCollection.SetModel(table, tmpClass);
 };

@@ -10,8 +10,8 @@ const path         = require('path');
 const Promise      = require('bluebird');
 const Query        = require('./query');
 const dateHelpers  = require(path.join(__dirname, '..', 'helpers', 'dates'));
-const { GetModel } = require(path.join(__dirname, '..', 'model'));
 const Types        = require(path.join(__dirname, '..', 'schema', 'types'));
+const { GetModel } = require(path.join(__dirname, '..', 'model', 'model-collection'));
 
 /**
  * Update an item in our database
@@ -25,10 +25,9 @@ const Types        = require(path.join(__dirname, '..', 'schema', 'types'));
 module.exports = (table, model) => {
   if(!model.id) 
     throw new Error('Error, unable to update an item without id (NO PRIMARY KEY)');
-  
 
   const currentId = model.id;
-  const _schema = model.schema.paths;
+  const _schema = model.__proto__.schema.paths;
   let tmpQuery = "UPDATE " + table.toLowerCase() + " SET ";
   let tmpValues = "";
 
@@ -62,19 +61,19 @@ module.exports = (table, model) => {
 
   return new Promise((resolve, reject) => {
     const query = Query();
-    query.run(tmpQuery)
+    return query.run(tmpQuery)
       .then(response => {
         query.run(`SELECT * FROM ${table.toLowerCase()} WHERE ${table}.id = ${currentId};`)
           .then(res => {
             let item = new GetModel(table)(res.results[0]);
-            resolve(item);
+            return resolve(item);
           })
           .catch(err => {
-            reject(err);
+            return reject(err);
           })
       })
       .catch(err => {
-        reject(err);
+        return reject(err);
       })
   });
 };

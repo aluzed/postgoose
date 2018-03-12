@@ -6,8 +6,6 @@
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
 */
-const PostgooseModel = require('./postgoose-model');
-
 let __models = {};
 
 /**
@@ -27,14 +25,13 @@ module.exports = {
    *
    * @function SetModel
    *
-   * @param {String} table name of the table
-   * @param {Object} schema Schema object
+   * @param {String} table Name of the table
+   * @param {Object} model Model object
    * @return {Object} model
    */
-   SetModel: (table, schema) => {
-    __models[table] = PostgooseModel(table, schema);
-
-    return __models[table];
+   SetModel: (table, model) => {
+    __models[table] = model;
+    return model;
   },
   /**
    * Return a model from the models collection

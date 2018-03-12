@@ -108,8 +108,12 @@ module.exports = {
       this.paths = {};
 
       this.hooks = {
-        pre  : Object.assign({}, _HooksList),
-        post : Object.assign({}, _HooksList)
+        pre  : _HooksList.reduce((acc, cur) => { 
+          return Object.assign(acc, { [cur]: null });
+        }, {}),
+        post: _HooksList.reduce((acc, cur) => {
+          return Object.assign(acc, { [cur]: null });
+        }, {})
       };
 
       // Get a sanitized path for each field
@@ -134,38 +138,38 @@ module.exports = {
      */
     pre(hookType, callback) {
       // Check if hookType exists
-      if(typeof _HooksList[hookType] === "undefined")
+      if(_HooksList.indexOf(hookType) < 0)
         throw new Error(localErrors.UnknownHookType);
 
       this.hooks.pre[hookType] = callback;
     }
 
     /**
-    * @function post
-    *
-    * Bind a post hook to our schema
-    *
-    * @param {String} hookType
-    * @param {Function} callback
-    * @constraint hookType must be an allowed hook
-    * @throws {UnknownHookType}
-    */
+     * Bind a post hook to our schema
+     *
+     * @function post
+     *
+     * @param {String} hookType
+     * @param {Function} callback
+     * @constraint hookType must be an allowed hook
+     * @throws {UnknownHookType}
+     */
     post(hookType, callback) {
       // Check if hookType exists
-      if(typeof _HooksList[hookType] === "undefined")
+      if (_HooksList.indexOf(hookType) < 0)
         throw new Error(localErrors.UnknownHookType);
 
       this.hooks.post[hookType] = callback;
     }
 
     /**
-    * @entry Types
-    * @type Static Method
-    *
-    * Return the list of available types
-    *
-    * @return {Object}
-    */
+     * Return the list of available types
+     *
+     * @function Types
+     * @static
+     *
+     * @return {Object}
+     */
     static get Types() {
       return _Types;
     }

@@ -9,7 +9,7 @@
 const path         = require('path');
 const Query        = require('./query');
 const Promise      = require('bluebird');
-const { GetModel } = require(path.join(__dirname, '..', 'model'));
+const { GetModel } = require(path.join(__dirname, '..', 'model', 'model-collection'));
 const Types        = require(path.join(__dirname, '..', 'schema', 'types'));
 
 /**
@@ -36,7 +36,7 @@ const localErrors = {
  * @return {Promise|Object}
  */
 module.exports = (table, model, options) => {
-  const schema = model.schema.paths;
+  const schema = model.__proto__.schema.paths;
 
   let populated     = {};
 
@@ -47,10 +47,6 @@ module.exports = (table, model, options) => {
   let tmpLimit      = null;
   let tmpOffset     = null;
   let tmpLeftJoin   = null;
-
-  // Hooks
-  let preCallback   = null;
-  let postCallback  = null;
 
   // Check if there is a pending condition
   let pendingCondition = false;
@@ -407,10 +403,9 @@ module.exports = (table, model, options) => {
   *
   * Execute the query, if there are hooks, execute them too.
   *
-  * @param {Function} callback
   * @return {Promise}
   */
-  function exec(callback) {
+  function exec() {
     // Forge query
     if(tmpLeftJoin !== null)
       tmpQuery += tmpLeftJoin + " ";
@@ -433,32 +428,21 @@ module.exports = (table, model, options) => {
       tmpQuery += " OFFSET " + tmpOffset;
 
     return new Promise((resolve, reject) => {
-      if(preCallback !== null) {
-        preCallback(resolve);
-      }
-      else resolve();
-    }).then(() => {
-      return new Promise((resolve, reject) => {
-        const query = new Query();
-        query.run(tmpQuery)
-          .then(response => {
-            
-            // Turn response objects into models
-            for(let r in response.results) {
-              response.results[r] = new GetModel(table)(resposne.results[r]);
-            }
-            
-            if(postCallback !== null) {
-              postCallback(response.results);
-            }
+      const query = new Query();
+      query.run(tmpQuery)
+        .then(response => {
 
-            !!callback ? callback(null, response.results) : resolve(response.results);
-          })
-          .catch(err => {
-            !!callback ? callback(err) : reject(err);
-          });
-      });
-    })
+          // Turn response objects into models
+          for (let r in response.results) {
+            response.results[r] = new GetModel(table)(resposne.results[r]);
+          }
+
+          return resolve(response.results);
+        })
+        .catch(err => {
+          return reject(err);
+        });
+    });
 
   }
 
@@ -484,12 +468,6 @@ module.exports = (table, model, options) => {
     lt: lighter,
     skip,
     offset: skip, // Alias
-    _pre: (cb) => {
-      preCallback = cb;
-    },
-    _post: (cb) => {
-      postCallback = cb;
-    },
     populate,
     populated: () => Object.assign({}, populated),
     exec

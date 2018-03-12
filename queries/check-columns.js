@@ -30,7 +30,7 @@ module.exports = (table, schemaPaths) => {
   return new Promise((resolve, reject) => {
     const query = new Query();
 
-    query
+    return query
       .run(tmpQuery)
       .then(response => {
         let changed = false;
@@ -41,21 +41,33 @@ module.exports = (table, schemaPaths) => {
 
           if(column.column_name !== "id") {
             let currentType = Types[schemaPaths[column.column_name].instance].type;
-  
-            if(column.data_type !== currentType) {
-              changed = true;
-              chagnedFields.push(column.column_name);
+
+            switch (column.data_type) {
+              // String case
+              case "character varying":
+                if (currentType !== "varchar(255)") {
+                  changed = true;
+                  chagnedFields.push(column.column_name);
+                }
+              break;
+              // Default
+              default: 
+                if (column.data_type !== currentType) {
+                  changed = true;
+                  chagnedFields.push(column.column_name);
+                }
+              break;
             }
           }
         }
         
-        resolve({
+        return resolve({
           changed,
           chagnedFields
         });
       })
       .catch(err => {
-        reject(err);
+        return reject(err);
       });
   });
 }
