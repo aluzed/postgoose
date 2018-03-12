@@ -1,8 +1,7 @@
 /**
-* @module Queries
-* @resource Table Exists
+* @module Queries/TableExists
 *
-* Check if a table exists
+* @description Check if a table exists
 *
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
@@ -11,10 +10,9 @@ const path = require('path');
 const Query = require('./query');
 
 /**
- * @entry Table Exists
- * @type Query
- * 
  * Return if a table already exist or not
+ * 
+ * @function TableExists
  * 
  * @param {String} table 
  * @return {Promise}

@@ -1,10 +1,11 @@
 {
   "name": "postgoose",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Postgresql handler like mongoose",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test"      : "node ./node_modules/mocha/bin/_mocha ./tests/index.js",
+    "dev:stats" : "find . -name '*.js' -not -path './node_modules/*' -not -path './public/*' | xargs wc -l"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,9 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "pg": "^7.4.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.0.4"
   }
 }

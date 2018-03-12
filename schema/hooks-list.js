@@ -1,14 +1,10 @@
 /**
- * @module Core
- * @resource PostgooseSchema
+ * @module Core/PostgooseSchema
  * 
- * 
+ * @description list of all hooks
  */
 
 /**
-* @entry hooksList
-* @position before
-*
 * List of allowed hooks :
 * - create
 * - save

@@ -1,11 +1,30 @@
 /**
-* Date Helpers
-*
-* Set of tools to convert Date from JS > DB and DB > JS
+* @module Helpers/DateHelpers
+* 
+* @description Set of tools to convert Date from JS > DB and DB > JS
 *
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
 */
+
+/**
+ * Displays numbers on 2 digits
+ * 
+ * @function NumberFormatter
+ * 
+ * @param {Number} num Integer
+ * @returns {String} 2 digits number as string
+ */
+function NumberFormatter(num) {
+    let numToStr = num.toString();
+
+    if(num < 10) {
+        numToStr = '0' + numToStr;    
+    }
+
+    return numToStr;
+}
+
 module.exports = {
     /**
      * toDateSQL 
@@ -21,8 +40,8 @@ module.exports = {
 
         let d = new Date(date);
 
-        let day   = d.getDate();
-        let month = d.getMonth() + 1;
+        let day   = NumberFormatter(d.getDate());
+        let month = NumberFormatter(d.getMonth() + 1);
         let year  = d.getFullYear();
 
         return `${year}-${month}-${day}`;
@@ -41,12 +60,12 @@ module.exports = {
 
         let d = new Date(date);
 
-        let day   = d.getDate();
-        let month = d.getMonth() + 1;
+        let day   = NumberFormatter(d.getDate());
+        let month = NumberFormatter(d.getMonth() + 1);
         let year  = d.getFullYear();
-        let hour  = d.getHours();
-        let min   = d.getMinutes();
-        let sec   = d.getSeconds();
+        let hour  = NumberFormatter(d.getHours());
+        let min   = NumberFormatter(d.getMinutes());
+        let sec   = NumberFormatter(d.getSeconds());
 
         return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
     }

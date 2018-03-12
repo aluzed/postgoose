@@ -1,8 +1,7 @@
 /**
-* @module Queries
-* @resource Query
+* @module Queries/Query
 *
-* Query runner library
+* @description Query runner library
 *
 * Copyright (c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
@@ -24,25 +23,23 @@ class Query {
   }
 
   /**
-   * @entry refreshConnection
-   * @type Function
-   *
    * Get connection from Connection lib
+   *
+   * @function refreshConnection
    */
   refreshConnection() {
     this.connection = Connection.getConnection();
   }
 
   /**
-  * @entry run
-  * @type Function
-  *
-  * Execute a sql query
-  *
-  * @param {String} queryStr
-  * @return {Promise}
-  * @throws {ConnectionNotInitialized}
-  */
+   * Execute a sql query
+   *
+   * @function run
+   *
+   * @param {String} queryStr
+   * @return {Promise}
+   * @throws {ConnectionNotInitialized}
+   */
   run(queryStr) {
     this.refreshConnection();
 

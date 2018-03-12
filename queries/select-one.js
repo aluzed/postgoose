@@ -1,7 +1,7 @@
 /**
-* @module Queries/Select
+* @module Queries/SelectOne
 *
-* @description Select data in our postgres database
+* @description Select a unique row in our postgres database
 *
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
@@ -346,26 +346,6 @@ module.exports = (table, model, options) => {
   }
 
   /**
-  * @entry limit
-  * @type Select Function
-  *
-  * Limit results
-  *
-  * @param {Number} val
-  * @return {Object} selectObject
-  * @constraint val must be type of Number
-  * @throws {paramTypeMismatch}
-  */
-  function limit(val) {
-    if(typeof val !== "number")
-      throw new Error(localErrors.paramTypeMismatch);
-
-    tmpLimit = val;
-
-    return selectObject;
-  }
-
-  /**
   * @entry skip
   * @type Select Function
   *
@@ -486,14 +466,8 @@ module.exports = (table, model, options) => {
   if(!!options.where)
     where(options.where);
 
-  if(!!options.group)
-    group(options.group);
-
   if(!!options.order)
     sort(options.order);
-
-  if(!!options.limit)
-    limit(options.limit);
 
   if(!!options.offset)
     skip(options.offset);
@@ -508,8 +482,6 @@ module.exports = (table, model, options) => {
     notbetween,
     gt: greater,
     lt: lighter,
-    group,
-    limit,
     skip,
     offset: skip, // Alias
     _pre: (cb) => {

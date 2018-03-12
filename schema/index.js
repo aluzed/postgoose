@@ -1,8 +1,7 @@
 /**
-* @module Core
-* @resource PostgooseSchema
+* @module Core/PostgooseSchema
 *
-* Schema class and definition
+* @description Schema class and definition
 *
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
@@ -12,8 +11,7 @@ const _Types     = require('./types');
 const _HooksList = require('./hooks-list');
 
 /**
-* @entry localErrors
-* @position before
+* localErrors
 *
 * - UndefinedType : The type does not exist in PostgooseSchema.Types
 * - UnknownHookType : The hook type does not exist in allowed hooksList
@@ -25,14 +23,13 @@ const localErrors = {
 };
 
 /**
-* @entry fieldToPath
-* @type Function
-*
-* Convert a field to a path
-*
-* @param {Object} field
-* @return {Object} path
-*/
+ * Convert a field to a path
+ *
+ * @function fieldToPath
+ *
+ * @param {Object} field
+ * @return {Object} path
+  */
 function fieldToPath(name, field) {
   let tmpPath = Object.assign({}, SchemaPath);
 
@@ -100,10 +97,9 @@ function fieldToPath(name, field) {
 module.exports = {
   Schema: class PostgooseSchema {
     /**
-     * @entry PostgooseSchema
-     * @type Class
+     * Schema Constructor
      *
-     * Schema class
+     * @constructor PostgooseSchema
      *
      * @param {Object} schema
      * @constraint each field type must exist in Postgoose.SChema.Types
@@ -127,16 +123,15 @@ module.exports = {
     }
 
     /**
-    * @entry pre
-    * @type Method
-    *
-    * Bind a pre hook to our schema
-    *
-    * @param {String} hookType
-    * @param {Function} callback
-    * @constraint hookType must be an allowed hook
-    * @throws {UnknownHookType}
-    */
+     * Bind a pre hook to our schema
+     *
+     * @function pre
+     *
+     * @param {String} hookType
+     * @param {Function} callback
+     * @constraint hookType must be an allowed hook
+     * @throws {UnknownHookType}
+     */
     pre(hookType, callback) {
       // Check if hookType exists
       if(typeof _HooksList[hookType] === "undefined")
@@ -146,8 +141,7 @@ module.exports = {
     }
 
     /**
-    * @entry post
-    * @type Method
+    * @function post
     *
     * Bind a post hook to our schema
     *

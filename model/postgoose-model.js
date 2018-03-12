@@ -1,8 +1,7 @@
 /**
-* @module Core
-* @resource Model
+* @module Core/Model
 *
-* Postgresql Model Class
+* @description Postgresql Model Class
 *
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
@@ -11,6 +10,7 @@ const Insert       = require('../queries/insert');
 const Update       = require('../queries/update');
 const Remove       = require('../queries/remove');
 const Select       = require('../queries/select');
+const SelectOne    = require('../queries/select-one');
 const Query        = require('../queries/query');
 const Promise      = require('bluebird');
 const path         = require('path');
@@ -20,9 +20,8 @@ const CreateTable  = require(path.join(__dirname, '..', 'queries', 'create-table
 const CheckColumns = require(path.join(__dirname, '..', 'queries', 'check-columns'));
 
 /**
- * @entry localErrors
- * @position before
- * 
+ * localErrors
+ *  
  * - ModelNotPersisted : model has not been persisted yet, so id column is missing.
  * - ModelAlreadyPersisted : model has already been persisted.
  * - ForbiddenColumnName : a column name is forbidden in schema definition.
@@ -38,10 +37,8 @@ module.exports = (table, schema) => {
 
   let tmpClass = class PostgooseModel {
     /**
-    * @entry PostgooseModel
-    * @type Class
-    *
     * PostgooseModel Constructor
+    * @class PostgooseModel
     *
     * @param {Object} modelObject
     */
@@ -109,10 +106,8 @@ module.exports = (table, schema) => {
     }
 
     /**
-     * @entry valuesToJS
-     * @type Method
-     * 
      * Convert DB values to JS format
+     * @method valuesToJS
      * 
      * @param {Object} object 
      * @return {Object}
@@ -130,14 +125,15 @@ module.exports = (table, schema) => {
     }
 
     /**
-    * @entry _mapCriterias
-    * @type Private Method
-    *
-    * Create an Array of conditions from an object { key: value }
-    *
-    * @param {Object} object
-    * @return {Array} SQL conditions
-    */
+     * Create an Array of conditions from an object { key: value }
+     * 
+     * @method _mapCriterias
+     * @private
+     *
+     *
+     * @param {Object} object
+     * @return {Array} SQL conditions
+     */
     _mapCriterias(object) {
       let tmpWhere = [];
 
@@ -181,14 +177,14 @@ module.exports = (table, schema) => {
     }
 
     /**
-    * @entry _sanitizeArguments
-    * @type Private Method
-    *
-    * Handles arguments and turn them into an object
-    *
-    * @param {Spread} args
-    * @return {Object} { fields, callback }
-    */
+     * Handles arguments and turn them into an object
+     * 
+     * @method _sanitizeArguments
+     * @private
+     *
+     * @param {Spread} args
+     * @return {Object} { fields, callback }
+     */
     _sanitizeArguments(...args) {
       let fields = null;
       let order = null;
@@ -220,15 +216,15 @@ module.exports = (table, schema) => {
     }
 
     /**
-    * @entry find
-    * @type Static Method
-    *
-    * Retreive data from our database
-    *
-    * @param {Object} criteria
-    * @param {Spread} args fields, order, callback
-    * @return {Error|QueryObject|Promise}
-    */
+     * Retreive data from our database
+     * 
+     * @method find
+     * @static
+     *
+     * @param {Object} criteria
+     * @param {Spread} args fields, order, callback
+     * @return {Error|QueryObject|Promise}
+     */ 
     static find(criteria, ...args) {
       const Self = this;
 
@@ -251,15 +247,15 @@ module.exports = (table, schema) => {
     }
 
     /**
-    * @entry findOne
-    * @type Static Method
-    *
-    * Retreive one row from our database
-    *
-    * @param {Object} criteria
-    * @param {Spread} args fields, order, callback
-    * @return {Error|QueryObject|Promise}
-    */
+     * Retreive one row from our database 
+     * 
+     * @method findOne
+     * @static
+     *
+     * @param {Object} criteria
+     * @param {Spread} args fields, order, callback
+     * @return {Error|QueryObject|Promise}
+     */
     static findOne(criteria, ...args) {
       const Self = this;
 
@@ -269,7 +265,7 @@ module.exports = (table, schema) => {
 
       const callback = params.callback;
 
-      let query = Select(Self.__proto__.table, Self, {
+      let query = SelectOne(Self.__proto__.table, Self, {
         where: conditions,
         fields: params.fields
       }).limit(1);
@@ -281,6 +277,10 @@ module.exports = (table, schema) => {
       if (!!Self.__proto__.schema.hooks.post.findOne)
         query._post(Self.__proto__.schema.hooks.post.findOne);
 
+      return new Promise((resolve, reject) => {
+        query.exec
+      })
+
       if (!!callback)
         query.exec(callback);
       else
@@ -288,19 +288,19 @@ module.exports = (table, schema) => {
     }
 
     /**
-    * @entry findById
-    * @type Static Method
-    *
-    * Retreive an item from our database
-    *
-    * @param {Number} id
-    * @param {Function} callback
-    * @return {Error|QueryObject|Promise}
-    */
-    static findById(id, callback) {
+     * Retreive an item from our database
+     *
+     * @method findById
+     * @static
+     *
+     * @param {Number} id
+     * @param {Function} callback
+     * @return {Error|QueryObject|Promise}
+     */
+     static findById(id, callback) {
       const Self = this;
 
-      let query = Select(Self.__proto__.table, Self, {
+      let query = SelectOne(Self.__proto__.table, Self, {
         where: [
           Self.__proto__.table + '.id = ' + id
         ]
@@ -320,10 +320,10 @@ module.exports = (table, schema) => {
     }
 
     /**
-     * @entry findByIdAndUpdate
-     * @type Static Method
-     * 
      * Retreive an item from our database and update it
+     * 
+     * @method findByIdAndUpdate
+     * @static
      * 
      * @param {Number} id 
      * @param {Object} newValues
@@ -359,10 +359,10 @@ module.exports = (table, schema) => {
     }
 
     /**
-     * @entry findByIdAndRemove
-     * @type Static Method
-     * 
      * Retreive an item from our database and remove it
+     * 
+     * @method findByIdAndRemove
+     * @static
      * 
      * @param {Number} id 
      * @param {Function} callback 
@@ -397,10 +397,9 @@ module.exports = (table, schema) => {
     }
 
     /**
-     * @entry create
-     * @type Method
-     * 
      * Create Method
+     * 
+     * @method create
      * 
      * @param {Function} callback 
      * @constraint this.id must be undefined
@@ -442,10 +441,9 @@ module.exports = (table, schema) => {
     }
 
     /**
-     * @entry save
-     * @type Method
-     * 
      * Save Method
+     * 
+     * @method save
      * 
      * @param {Function} callback 
      */
@@ -497,10 +495,9 @@ module.exports = (table, schema) => {
     }
 
     /**
-     * @entry remove
-     * @type Method
-     * 
      * Remove method
+     * 
+     * @method remove
      * 
      * @param {Function} callback 
      * @constraint this.id must exist
@@ -542,10 +539,9 @@ module.exports = (table, schema) => {
     }
 
     /**
-     * @entry update
-     * @type Method
-     * 
      * Update Method
+     * 
+     * @method update
      * 
      * @param {Object} newValues
      * @param {*} callback 

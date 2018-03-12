@@ -1,8 +1,7 @@
 /**
-* @module Queries
-* @resource Update Table
+* @module Queries/Update
 *
-* Update data in our Postgresql database
+* @description Update data in our Postgresql database
 *
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
@@ -15,10 +14,9 @@ const { GetModel } = require(path.join(__dirname, '..', 'model'));
 const Types        = require(path.join(__dirname, '..', 'schema', 'types'));
 
 /**
- * @entry Update
- * @type Query
- * 
  * Update an item in our database
+ * 
+ * @function Update
  * 
  * @param {String} table 
  * @param {Object} model 

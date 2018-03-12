@@ -1,8 +1,7 @@
 /**
-* @module Queries
-* @resource Create Table
+* @module Queries/CreateTable
 *
-* Create a table in our Postgresql database
+* @description Create a table in our Postgresql database
 *
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
@@ -13,13 +12,12 @@ const Promise = require('bluebird');
 const Types   = require(path.join(__dirname, '..', 'schema', 'types'));
 
 /**
- * @entry Create Table
- * @type Query
- * 
  * Generate the table in our database
  * 
- * @param {String} table 
- * @param {Object} schemaPaths 
+ * @function CreateTable
+ * 
+ * @param {String} table Table name
+ * @param {Object} schemaPaths Each columns
  * @return {Promise}
  */
 module.exports = (table, schemaPaths) => {

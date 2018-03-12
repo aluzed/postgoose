@@ -16,10 +16,9 @@ const {
 
 const PostGoose = {
   /**
-   * @entry connect
-   * @type Function
-   *
    * Connect to the database and set the connection for queries
+   *
+   * @function connect
    *
    * @param {Object} dbConfig : { host: "...", user: "...", password: "..." }
    */
@@ -28,10 +27,9 @@ const PostGoose = {
     Connection.connect(dbConfig);
   },
   /**
-   * @entry model
-   * @type Function
-   *
    * Set or Get a model, like in mongoose
+   *
+   * @function model
    *
    * @param {String} name
    * @param {Object} schema : optionnal
@@ -53,10 +51,9 @@ const PostGoose = {
   // Get Schema class
   Schema,
   /**
-   * @entry runOnce
-   * @type Function
-   *
    * Run a query and close the connection directly
+   *
+   * @function runOnce
    *
    * @param {Object} dbConfig
    * @param {String} queryStr
@@ -81,10 +78,9 @@ const PostGoose = {
     })
   },
   /**
-   * @entry run
-   * @type Function
-   *
    * Execute a query
+   *
+   * @function run
    *
    * @param {String} queryStr
    * @return {Promise}
@@ -105,20 +101,13 @@ const PostGoose = {
         });
     })
   },
-  /**
-  * @entry connection
-  * @type Object
-  *
-  *
-  */
   connection: {
     /**
-    * @entry connection.close
-    * @type Function
-    *
-    * Close the socket
-    *
-    */
+     * Close the socket
+     *
+     * @function connection.close
+     *
+     */
     close: () => Connection.disconnect()
   }
 }

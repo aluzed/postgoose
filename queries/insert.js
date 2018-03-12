@@ -1,8 +1,7 @@
 /**
-* @module Queries
-* @resource Insert
+* @module Queries/Insert
 *
-* Insert data in our Postgresql database
+* @description Insert data in our Postgresql database
 *
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
@@ -15,8 +14,9 @@ const { GetModel } = require(path.join(__dirname, '..', 'model'));
 const Types        = require(path.join(__dirname, '..', 'schema', 'types'));
 
 /**
- * @entry Insert
- * @type Query
+ * Insert a new row
+ * 
+ * @function Insert
  * 
  * @param {String} table 
  * @param {Object} model 

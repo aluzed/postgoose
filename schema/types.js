@@ -1,22 +1,18 @@
 /**
- * @module Core
- * @resource PostgooseSchema
+ * @module Core/PostgooseSchema/Types
  * 
+ * @description List of all available types
  * 
  */
 const path = require('path');
-module.exports = 
 /**
-* @start_entry TypesList
-* @position before
-* @plugin json-to-table
-*
-* List of types
-*
-* JSON Doc: http://clarkdave.net/2013/06/what-can-you-do-with-postgresql-and-json/
-*
-*/
-{
+ * TypesList
+ * 
+ * List of types
+ *
+ * JSON Doc: http://clarkdave.net/2013/06/what-can-you-do-with-postgresql-and-json/
+ */
+module.exports = {
   Mixed     : require(path.join(__dirname, '..', 'types', 'mixed')),
   Uuid      : require(path.join(__dirname, '..', 'types', 'uuid')),
   String    : require(path.join(__dirname, '..', 'types', 'string')),
@@ -28,8 +24,4 @@ module.exports =
   Date      : require(path.join(__dirname, '..', 'types', 'date')),
   Json      : require(path.join(__dirname, '..', 'types', 'json')),
   JsonB     : require(path.join(__dirname, '..', 'types', 'jsonb'))
-}
-/**
-* @end_endry TypesList
-*/
-;
+};

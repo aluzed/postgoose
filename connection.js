@@ -9,22 +9,20 @@ const localErrors = {
 module.exports = {
   Connection: {
     /**
-    * @entry isConnected
-    * @type Function
-    *
-    * Return if the connection is set or not
+     * Return if the connection is set or not
+     *
+    * @function isConnected
     *
     * @return {Boolean}
     */
     isConnected: () => currentConnection !== null,
     /**
-    * @entry connect
-    * @type Function
-    *
-    * Copy the connection informations and connect to Postgresql database
-    *
-    * @param {Object} dbConfig : { host: "...", user: "...", password: "..." }
-    */
+     * Copy the connection informations and connect to Postgresql database
+     *
+     * @function connect
+     *
+     * @param {Object} dbConfig : { host: "...", user: "...", password: "..." }
+     */
     connect: (dbConfig) => {
       if (!currentConnection) {
         currentConnection = new Client(dbConfig);
@@ -33,13 +31,12 @@ module.exports = {
       }
     },
     /**
-    * @entry disconnect
-    * @type Function
-    *
-    * Disconnect the socket
-    *
-    * @throws {ConnectionNotInitialized}
-    */
+     * Disconnect the socket
+     *
+     * @function disconnect
+     *
+     * @throws {ConnectionNotInitialized}
+     */
     disconnect: () => {
       if (!currentConnection) throw new Error(localErrors.ConnectionNotInitialized);
 
@@ -47,22 +44,20 @@ module.exports = {
       currentConnection = null;
     },
     /**
-    * @entry getConfig
-    * @type Function
-    *
-    * Get the current DB Config
-    *
-    * @return {Object}
-    */
+     * Get the current DB Config
+     *
+     * @function getConfig
+     *
+     * @return {Object}
+     */
     getConfig: () => dbConf,
     /**
-    * @entry getConnection
-    * @type Function
-    *
-    * Return the current connection object
-    *
-    * @return {Object}
-    */
+     * Return the current connection object
+     *
+     * @function getConnection
+     *
+     * @return {Object}
+     */
     getConnection: () => currentConnection
   },
   ConnectionErrors: localErrors

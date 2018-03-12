@@ -1,8 +1,7 @@
 /**
-* @module Queries
-* @resource Check Columns
+* @module Queries/CheckColumns
 *
-* Check each columns and look if schema has changed
+* @description Check each columns and look if schema has changed
 *
 * Copyright(c) 2018 Alexandre PENOMBRE
 * <aluzed_AT_gmail.com>
@@ -16,13 +15,12 @@ function compareColumn(column, schemaPath) {
 }
 
 /**
- * @entry Check Columns
- * @type Query
- * 
  * Check each column of a given table and notify in case of change
  * 
- * @param {String} table 
- * @param {Object} schemaPaths 
+ * @function Check Columns
+ * 
+ * @param {String} table Table name
+ * @param {Object} schemaPaths Each columns
  * @return {Promise}
  */
 module.exports = (table, schemaPaths) => {
