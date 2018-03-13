@@ -23,9 +23,14 @@ describe('Tests Postgoose', () => {
   });
 
   it('Should clean our database', done => {
-    postgoose.run('TRUNCATE TABLE People; ALTER SEQUENCE People_id_seq RESTART WITH 1;').then(() => {
+    Promise.all(
+      [
+        postgoose.run('TRUNCATE TABLE people; ALTER SEQUENCE people_id_seq RESTART WITH 1;'),
+        postgoose.run('TRUNCATE TABLE users; ALTER SEQUENCE users_id_seq RESTART WITH 1;')
+      ]
+    ).then(() => {
       done();
-    })
+    });
   })
 
   it('Should create people model', done => {
