@@ -76,7 +76,6 @@ describe('Tests Postgoose', () => {
       details: 'designer'
     };
 
-
     Promise.all(
       [
         Users.create(tmpUsers1).then(user => {
