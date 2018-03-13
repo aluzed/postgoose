@@ -26,17 +26,17 @@ const localErrors = {
 }
 
 /**
- * Generate a select object to retreive data easily
+ * Generate a select object to retreive a row easily
  * 
  * @function Select
  * 
  * @param {String} table 
- * @param {Object} model 
+ * @param {Object} schemaObject
  * @param {Object} options 
  * @return {Promise|Object}
  */
-module.exports = (table, model, options) => {
-  const schema = model.__proto__.schema.paths;
+module.exports = (table, schemaObject, options) => {
+  const schema = schemaObject.paths;
 
   let populated     = {};
 

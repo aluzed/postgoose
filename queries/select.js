@@ -31,12 +31,12 @@ const localErrors = {
  * @function Select
  * 
  * @param {String} table 
- * @param {Object} model 
+ * @param {Object} schemaObject
  * @param {Object} options 
  * @return {Promise|Object}
  */
-module.exports = (table, model, options) => {
-  const schema = model.__proto__.schema.paths;
+module.exports = (table, schemaObject, options) => {
+  const schema = schemaObject.paths;
 
   let populated     = {};
 

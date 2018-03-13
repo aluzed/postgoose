@@ -93,86 +93,87 @@ function fieldToPath(name, field) {
   return tmpPath;
 }
 
+const PostgooseSchema = class {
+  /**
+   * Schema Constructor
+   *
+   * @constructor PostgooseSchema
+   *
+   * @param {Object} schema
+   * @constraint each field type must exist in Postgoose.SChema.Types
+   */
+  constructor(schema) {
+    this.paths = {};
+
+    this.hooks = {
+      pre: _HooksList.reduce((acc, cur) => {
+        return Object.assign(acc, { [cur]: null });
+      }, {}),
+      post: _HooksList.reduce((acc, cur) => {
+        return Object.assign(acc, { [cur]: null });
+      }, {})
+    };
+
+    // Get a sanitized path for each field
+    for (let field in schema) {
+      this.paths[field] = fieldToPath(field, schema[field]);
+    }
+
+    this.methods = {};
+
+    this.statics = {};
+  }
+
+  /**
+   * Bind a pre hook to our schema
+   *
+   * @function pre
+   *
+   * @param {String} hookType
+   * @param {Function} callback
+   * @constraint hookType must be an allowed hook
+   * @throws {UnknownHookType}
+   */
+  pre(hookType, callback) {
+    // Check if hookType exists
+    if (_HooksList.indexOf(hookType) < 0)
+      throw new Error(localErrors.UnknownHookType);
+
+    this.hooks.pre[hookType] = callback;
+  }
+
+  /**
+   * Bind a post hook to our schema
+   *
+   * @function post
+   *
+   * @param {String} hookType
+   * @param {Function} callback
+   * @constraint hookType must be an allowed hook
+   * @throws {UnknownHookType}
+   */
+  post(hookType, callback) {
+    // Check if hookType exists
+    if (_HooksList.indexOf(hookType) < 0)
+      throw new Error(localErrors.UnknownHookType);
+
+    this.hooks.post[hookType] = callback;
+  }
+
+  /**
+   * Return the list of available types
+   *
+   * @function Types
+   * @static
+   *
+   * @return {Object}
+   */
+  static get Types() {
+    return _Types;
+  }
+}
 
 module.exports = {
-  Schema: class PostgooseSchema {
-    /**
-     * Schema Constructor
-     *
-     * @constructor PostgooseSchema
-     *
-     * @param {Object} schema
-     * @constraint each field type must exist in Postgoose.SChema.Types
-     */
-    constructor(schema) {
-      this.paths = {};
-
-      this.hooks = {
-        pre  : _HooksList.reduce((acc, cur) => { 
-          return Object.assign(acc, { [cur]: null });
-        }, {}),
-        post: _HooksList.reduce((acc, cur) => {
-          return Object.assign(acc, { [cur]: null });
-        }, {})
-      };
-
-      // Get a sanitized path for each field
-      for(let field in schema) {
-        this.paths[field] = fieldToPath(field, schema[field]);
-      }
-
-      this.methods = {};
-
-      this.statics = {};
-    }
-
-    /**
-     * Bind a pre hook to our schema
-     *
-     * @function pre
-     *
-     * @param {String} hookType
-     * @param {Function} callback
-     * @constraint hookType must be an allowed hook
-     * @throws {UnknownHookType}
-     */
-    pre(hookType, callback) {
-      // Check if hookType exists
-      if(_HooksList.indexOf(hookType) < 0)
-        throw new Error(localErrors.UnknownHookType);
-
-      this.hooks.pre[hookType] = callback;
-    }
-
-    /**
-     * Bind a post hook to our schema
-     *
-     * @function post
-     *
-     * @param {String} hookType
-     * @param {Function} callback
-     * @constraint hookType must be an allowed hook
-     * @throws {UnknownHookType}
-     */
-    post(hookType, callback) {
-      // Check if hookType exists
-      if (_HooksList.indexOf(hookType) < 0)
-        throw new Error(localErrors.UnknownHookType);
-
-      this.hooks.post[hookType] = callback;
-    }
-
-    /**
-     * Return the list of available types
-     *
-     * @function Types
-     * @static
-     *
-     * @return {Object}
-     */
-    static get Types() {
-      return _Types;
-    }
-  },
-  SchemaErrors: localErrors
+  Schema       : PostgooseSchema,
+  SchemaErrors : localErrors
 };

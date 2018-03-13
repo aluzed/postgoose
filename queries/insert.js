@@ -18,12 +18,13 @@ const { GetModel } = require(path.join(__dirname, '..', 'model', 'model-collecti
  * 
  * @function Insert
  * 
- * @param {String} table 
- * @param {Object} model 
+ * @param {String} table Table name
+ * @param {Object} model Model Object
+ * @param {Object} item Data
  * @return {Promise}
  */
 module.exports = (table, model) => {
-  const _schema = model.__proto__.schema.paths;
+  const schema = model._schema.paths;
   let tmpQuery = "INSERT INTO " + table.toLowerCase() + " (";
   let tmpFields = "";
   let tmpValues = "";
@@ -36,7 +37,6 @@ module.exports = (table, model) => {
    *
    * @function exec
    *
-   * @param {Function} callback (err, results) => {...}
    * @return {Promise}
    */
   function exec() {
@@ -47,16 +47,16 @@ module.exports = (table, model) => {
           preCallback = preCallback.bind(model);
           return preCallback(res);
         }
-        else res();
+        else return res();
       })
       .then(() => {
         let query = new Query();
 
-        for (let field in _schema) {
+        for (let field in schema) {
 
           // Check validators 
-          for (let v in _schema[field].validators) {
-            let currentValidator = _schema[field].validators[v];
+          for (let v in schema[field].validators) {
+            let currentValidator = schema[field].validators[v];
 
             if (!currentValidator.validator(model[field])) {
               throw new Error(currentValidator.message);
@@ -66,15 +66,16 @@ module.exports = (table, model) => {
           let value = (typeof model[field] !== "undefined") ? model[field] : null;
 
           // Default Value
-          if (typeof _schema[field].defaultValue !== "undefined" && value === null)  {
-            if (typeof _schema[field].defaultValue === "function")
-              value = _schema[field].defaultValue();
+          if (typeof schema[field].defaultValue !== "undefined" && value === null)  {
+            if (typeof schema[field].defaultValue === "function")
+              value = schema[field].defaultValue();
             else
-              value = _schema[field].default;
+              value = schema[field].default;
           }
 
           // Only if the field exists in the model table
-          if (!!_schema[field] && field !== "id" && (!!model[field] || !!value)) {
+          // The field must not start with _
+          if (!!schema[field] && field !== "id" && (!!model[field] || !!value)) {
             if (tmpFields !== "") {
               tmpFields += ", ";
             }
@@ -85,7 +86,7 @@ module.exports = (table, model) => {
               tmpValues += ", ";
             }
 
-            let currentInstance = _schema[field].instance;
+            let currentInstance = schema[field].instance;
 
             // Convert JS to DB
             tmpValues += "\'" + Types[currentInstance].toDB(value) + "\'";
@@ -107,6 +108,7 @@ module.exports = (table, model) => {
 
               return resolve(item);
             }
+            else return resolve(null);
           })
           .catch(err => {
             return reject(err);

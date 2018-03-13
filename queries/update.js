@@ -27,53 +27,90 @@ module.exports = (table, model) => {
     throw new Error('Error, unable to update an item without id (NO PRIMARY KEY)');
 
   const currentId = model.id;
-  const _schema = model.__proto__.schema.paths;
+  const _schema = model._schema.paths;
   let tmpQuery = "UPDATE " + table.toLowerCase() + " SET ";
   let tmpValues = "";
 
-  // Check validators
-  for (let field in _schema) {
-    for(let v in _schema[field].validators) {
-      let currentValidator = _schema[field].validators[v];
+  let preCallback = null;
+  let postCallback = null;
 
-      if(!currentValidator.validator(model[field])) {
-        throw new Error(currentValidator.message);
-      }
-    }
-  }
+  /**
+   * 
+   * @function exec
+   * 
+   * @return {Promise}
+   */
+  function exec() {
+    return new Promise((resolve, reject) => {
 
-  for (let field in model) {
-    // Only if the field exists in the model table
-    if (!!_schema[field] && field !== "id") {
+      return new Promise((res, rej) => {
+        if (!!preCallback) {
+          preCallback = preCallback.bind(model);
+          return preCallback(res);
+        }
+        else return res();
+      })
+      .then(() => {
+        let query = new Query();
 
-      if (tmpValues !== "") {
-        tmpValues += ", ";
-      }
+        // Check validators
+        for (let field in _schema) {
+          for (let v in _schema[field].validators) {
+            let currentValidator = _schema[field].validators[v];
 
-      let currentInstance = _schema[field].instance;
+            if (!currentValidator.validator(model[field])) {
+              throw new Error(currentValidator.message);
+            }
+          }
+        }
 
-      // Convert JS to DB
-      tmpValues = table.toLowerCase() + '.' + field + "=\'" + Types[currentInstance].toDB(model[field]) + "\'";
-    }
-  }
+        for (let field in model) {
+          // Only if the field exists in the model table
+          if (!!_schema[field] && field !== "id") {
 
-  tmpQuery += tmpValues + " WHERE " + table.toLowerCase() + ".id=\'" + currentId + "\';";
+            if (tmpValues !== "") {
+              tmpValues += ", ";
+            }
 
-  return new Promise((resolve, reject) => {
-    const query = Query();
-    return query.run(tmpQuery)
-      .then(response => {
-        query.run(`SELECT * FROM ${table.toLowerCase()} WHERE ${table}.id = ${currentId};`)
-          .then(res => {
-            let item = new GetModel(table)(res.results[0]);
-            return resolve(item);
+            let currentInstance = _schema[field].instance;
+
+            // Convert JS to DB
+            tmpValues = table.toLowerCase() + '.' + field + "=\'" + Types[currentInstance].toDB(model[field]) + "\'";
+          }
+        }
+
+        tmpQuery += tmpValues + " WHERE " + table.toLowerCase() + ".id=\'" + currentId + "\' RETURNING *;";
+
+        return query.run(tmpQuery)
+          .then(response => {
+            if(response.results.rows.length > 0) {
+              let item = new GetModel(table)(res.results.rows[0]);
+
+              if (!!postCallback) {
+                postCallback = postCallback.bind(item);
+                postCallback(item);
+              }
+
+              return resolve(item);
+            }
+            else return resolve(null);
           })
           .catch(err => {
             return reject(err);
           })
       })
-      .catch(err => {
-        return reject(err);
-      })
-  });
+    })
+  }
+
+  const updatetObject = {
+    exec,
+    _pre: callback => {
+      preCallback = callback;
+    },
+    _post: callback => {
+      postCallback = callback;
+    }
+  };
+
+  return updateObject;
 };

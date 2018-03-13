@@ -39,8 +39,8 @@ const PostGoose = {
    *
    * @function model
    *
-   * @param {String} name
-   * @param {Object} schema : optionnal
+   * @param {String} name Table name
+   * @param {Object} schema Schema object (Optionnal)
    * @return {Model}
    */
   model: (name, schema) => {

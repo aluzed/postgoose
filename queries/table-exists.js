@@ -29,7 +29,7 @@ module.exports = (table) => {
       .run(tmpQuery)
       .then(response => {
         return resolve(response.results.rows.find(r => 
-          r.tablename === table.toLowerCase())
+          r.tablename === table.toLowerCase() || null)
         );
       })
       .catch(err => {

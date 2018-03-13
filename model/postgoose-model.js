@@ -41,9 +41,97 @@ const forbiddenColumns = [
   'remove'
 ];
 
+/**
+ * Create an Array of conditions from an object { key: value }
+ * 
+ * @function _mapCriterias
+ *
+ * @param {Object} object
+ * @return {Array} SQL conditions
+  */
+function _mapCriterias(object) {
+  let tmpWhere = [];
+
+  // Check special keywords
+  for (let key in object) {
+    let value = object[key];
+    let matched = false;
+
+    if (typeof value === "object") {
+      for (let i in value) {
+        switch (i) {
+          case '$lt':
+            tmpWhere.push(key + ' < ' + value[i]);
+            break;
+          case '$gt':
+            tmpWhere.push(key + ' > ' + value[i]);
+            break;
+          case '$in':
+            let newCondition = key + ' IN (';
+            for (let val in value[i]) {
+              newCondition += `'${value[i][val]}'`;
+
+              // If has next value
+              if (typeof value[i][val + 1] !== "undefined") {
+                newCondition += ', ';
+              }
+            }
+            newCondition += ')';
+
+            tmpWhere.push(newCondition);
+            break;
+        }
+      }
+    }
+
+    if (typeof value === "string" || typeof value === "number")
+      tmpWhere.push(key + ' = ' + value);
+  }
+
+  return tmpWhere;
+}
+
+/**
+ * Handles arguments and turn them into an object
+ * 
+ * @function _sanitizeArguments
+ *
+ * @param {Spread} args
+ * @return {Object} { fields, callback }
+ */
+function _sanitizeArguments(...args) {
+  let fields = null;
+  let order = null;
+  let callback = null;
+
+  for (let i in args) {
+    // If this is a function, assign our callback
+    if (typeof args[i] === 'function') {
+      callback = args[i];
+    }
+    else {
+      switch (i) {
+        case 0:
+          fields = args[0];
+          break;
+        case 1:
+          if (typeof args[1].sort !== "undefied")
+            order = args[1].sort;
+          break;
+      }
+    }
+  }
+
+  return {
+    fields,
+    order,
+    callback
+  };
+}
+
 module.exports = (table, schema) => {
 
-  let tmpClass = class PostgooseModel {
+  let PostgooseModel = class {
     /**
     * PostgooseModel Constructor
     * @class PostgooseModel
@@ -53,31 +141,24 @@ module.exports = (table, schema) => {
     constructor(modelObject) {
       this.id = null;
 
-      this.__proto__.schema = schema;
-      this.__proto__.table = table;
+      this._schema = schema;
+      this._table = table;
 
       // assign pre hooks
-      if (!!this.__proto__.schema.hooks.pre.init) {
-        const val = this.__proto__.schema.hooks.pre.init(this);
+      if (!!this._schema.hooks.pre.init) {
+        const val = this._schema.hooks.pre.init(this);
         for (let field in val) {
           this[field] = val[field];
         }
       }
 
       // assign  post hooks
-      if (!!this.__proto__.schema.hooks.post.init) {
-        const val = this.__proto__.schema.hooks.post.init(this);
+      if (!!this._schema.hooks.post.init) {
+        const val = this._schema.hooks.post.init(this);
         for (let field in val) {
           this[field] = val[field];
         }
       }
-
-      // Set deep object values
-      this.__proto__._setValues = (values) => {
-        for (let field in values) {
-          this[field] = values[field];
-        }
-      };
 
       // Fields
       for (let field in modelObject) {
@@ -96,8 +177,38 @@ module.exports = (table, schema) => {
           this[i] = this[i].bind(this);
         }
       }
+
+      // assign pre hooks
+      if (!!schema.hooks.pre.init) {
+        const val = schema.hooks.pre.init(this);
+        for (let field in val) {
+          this[field] = val[field];
+        }
+      }
+
+      // assign  post hooks
+      if (!!schema.hooks.post.init) {
+        const val = schema.hooks.post.init(this);
+        for (let field in val) {
+          this[field] = val[field];
+        }
+      }
     }
 
+    // Set deep object values
+    _setValues(values) {
+      for (let field in values) {
+        this[field] = values[field];
+      }
+    }
+
+    /**
+     * Convert JS values to DB query format
+     * @method valuesToDB
+     * 
+     * @param {Object} object 
+     * @return {Object}
+     */
     valuesToDB() {
 
     }
@@ -109,107 +220,16 @@ module.exports = (table, schema) => {
      * @param {Object} object 
      * @return {Object}
      */
-    valuesToJS(object) {
+    valuesToJS() {
       let newObject = {};
 
-      for(let field in object) {
-        let { instance } = this.__proto__.schema.paths[field];
+      for (let field in schema.paths) {
+        let { instance } = schema.paths[field];
 
         newObject[field] = Types[instance].toJS(object[field]);
       }
 
       return newObject;
-    }
-
-    /**
-     * Create an Array of conditions from an object { key: value }
-     * 
-     * @method _mapCriterias
-     * @private
-     *
-     *
-     * @param {Object} object
-     * @return {Array} SQL conditions
-     */
-    _mapCriterias(object) {
-      let tmpWhere = [];
-
-      // Check special keywords
-      for (let key in object) {
-        let value = object[key];
-        let matched = false;
-
-        if (typeof value === "object") {
-          for (let i in value) {
-            switch (i) {
-              case '$lt':
-                tmpWhere.push(key + ' < ' + value[i]);
-                break;
-              case '$gt':
-                tmpWhere.push(key + ' > ' + value[i]);
-                break;
-              case '$in':
-                let newCondition = key + ' IN (';
-                for (let val in value[i]) {
-                  newCondition += `'${value[i][val]}'`;
-
-                  // If has next value
-                  if (typeof value[i][val + 1] !== "undefined")  {
-                    newCondition += ', ';
-                  }
-                }
-                newCondition += ')';
-
-                tmpWhere.push(newCondition);
-                break;
-            }
-          }
-        }
-
-        if (typeof value === "string" || typeof value === "number")
-          tmpWhere.push(key + ' = ' + value);
-      }
-
-      return tmpWhere;
-    }
-
-    /**
-     * Handles arguments and turn them into an object
-     * 
-     * @method _sanitizeArguments
-     * @private
-     *
-     * @param {Spread} args
-     * @return {Object} { fields, callback }
-     */
-    _sanitizeArguments(...args) {
-      let fields = null;
-      let order = null;
-      let callback = null;
-
-      for (let i in args) {
-        // If this is a function, assign our callback
-        if (typeof args[i] === 'function') {
-          callback = args[i];
-        }
-        else {
-          switch (i) {
-            case 0:
-              fields = args[0];
-              break;
-            case 1:
-              if (typeof args[1].sort !== "undefied")
-                order = args[1].sort;
-              break;
-          }
-        }
-      }
-
-      return {
-        fields,
-        order,
-        callback
-      };
     }
 
     /**
@@ -223,15 +243,14 @@ module.exports = (table, schema) => {
      * @return {Error|QueryObject|Promise}
      */ 
     static find(criteria, ...args) {
-      const Self = this;
 
-      const conditions = Self._mapCriterias(criteria);
+      const conditions = _mapCriterias(criteria);
 
-      const params = Self._sanitizeArguments(args);
+      const params = _sanitizeArguments(args);
 
       const callback = params.callback;
 
-      let query = Select(Self.__proto__.table, Self, {
+      let query = Select(table, schema, {
         where: conditions,
         fields: params.fields,
         order: params.order
@@ -254,25 +273,24 @@ module.exports = (table, schema) => {
      * @return {Error|QueryObject|Promise}
      */
     static findOne(criteria, ...args) {
-      const Self = this;
 
-      const conditions = Self._mapCriterias(criteria);
+      const conditions = _mapCriterias(criteria);
 
-      const params = Self._sanitizeArguments(args);
+      const params = _sanitizeArguments(args);
 
       const callback = params.callback;
 
-      let query = SelectOne(Self.__proto__.table, Self, {
+      let query = SelectOne(table, schema, {
         where: conditions,
         fields: params.fields
       }).limit(1);
 
       // Bind hooks
-      if (!!Self.__proto__.schema.hooks.pre.findOne)
-        query._pre(Self.__proto__.schema.hooks.pre.findOne);
+      if (!!schema.hooks.pre.findOne)
+        query._pre(schema.hooks.pre.findOne);
 
-      if (!!Self.__proto__.schema.hooks.post.findOne)
-        query._post(Self.__proto__.schema.hooks.post.findOne);
+      if (!!schema.hooks.post.findOne)
+        query._post(schema.hooks.post.findOne);
 
       return new Promise((resolve, reject) => {
         query.exec
@@ -295,20 +313,19 @@ module.exports = (table, schema) => {
      * @return {Error|QueryObject|Promise}
      */
      static findById(id, callback) {
-      const Self = this;
 
-      let query = SelectOne(Self.__proto__.table, Self, {
+       let query = SelectOne(table, schema, {
         where: [
-          Self.__proto__.table + '.id = ' + id
+          table + '.id = ' + id
         ]
       }).limit(1);
 
       // Bind hooks
-      if (!!Self.__proto__.schema.hooks.pre.findById)
-        query._pre(Self.__proto__.schema.hooks.pre.findById);
+      if (!!schema.hooks.pre.findById)
+        query._pre(schema.hooks.pre.findById);
 
-      if (!!Self.__proto__.schema.hooks.post.findById)
-        query._post(Self.__proto__.schema.hooks.post.findById);
+      if (!!schema.hooks.post.findById)
+        query._post(schema.hooks.post.findById);
 
       if (!!callback)
         query.exec(callback);
@@ -327,11 +344,10 @@ module.exports = (table, schema) => {
      * @param {Function} callback 
      */
     static findByIdAndUpdate(id, newValues, callback) {
-      const Self = this;
 
-      let query = Select(Self.__proto__.table, Self, {
+      let query = SelectOne(table, schema, {
         where: [
-          Self.__proto__.table + '.id = ' + id
+          table + '.id = ' + id
         ]
       }).limit(1);
 
@@ -365,11 +381,10 @@ module.exports = (table, schema) => {
      * @param {Function} callback 
      */
     static findByIdAndRemove(id, callback) {
-      const Self = this;
 
-      let query = Select(Self.__proto__.table, Self, {
+      let query = SelectOne(table, schema, {
         where: [
-          Self.__proto__.table + '.id = ' + id
+          table + '.id = ' + id
         ]
       }).limit(1);
 
@@ -403,20 +418,12 @@ module.exports = (table, schema) => {
      * @throws {ModelAlreadyPersisted}
      */
     static create(item, callback)  {
-      const Self = this;
+      let model = new this(item);
 
-      if (typeof Self.id !== "undefined")
-        throw new Error(localErrors.ModelAlreadyPersisted);
+      let inserObj = Insert(table, model);
 
-      if (!!Self.id)
-        throw new Error(localErrors.ItemExists);
-
-      let model = new Self(item);
-
-      let inserObj = Insert(Self.__proto__.table, model);
-
-      inserObj._pre = Self.__proto__.schema.hooks.pre.create;
-      inserObj._post = Self.__proto__.schema.hooks.post.create;
+      inserObj._pre(schema.hooks.pre.create);
+      inserObj._post(schema.hooks.post.create);
 
       return new Promise((resolve, reject) => {
         return inserObj.exec().then(row => {
@@ -440,8 +447,8 @@ module.exports = (table, schema) => {
 
       return new Promise((resolve, reject) => {
         // If has pre hook, exec the callback first
-        if (!!Self.__proto__.schema.hooks.pre.save) {
-          Self.__proto__.schema.hooks.pre.save(resolve);
+        if (!!Self._schema.hooks.pre.save) {
+          Self._schema.hooks.pre.save(resolve);
         }
         else {
           // Or resolve
@@ -452,12 +459,12 @@ module.exports = (table, schema) => {
         return new Promise((resolve, reject) => {
           // Insert Case
           if (!Self.id) {
-            Insert(Self.__proto__.table, this).then(values => {
-              Self.__proto__._setValues(values);
+            Insert(Self._table, this).then(values => {
+              Self._setValues(values);
 
               // If there is a hook after save
-              if (!!Self.__proto__.schema.hooks.post.save)
-                Self.__proto__.schema.hooks.post.save(Self);
+              if (!!Self._schema.hooks.post.save)
+                Self._schema.hooks.post.save(Self);
 
               return !!callback ? callback(null, Self) : resolve(Self);
             }).catch(err => {
@@ -466,12 +473,12 @@ module.exports = (table, schema) => {
           }
           // Update Case
           else {
-            Update(Self.__proto__.table, Self).then(values => {
-              Self.__proto__._setValues(values);
+            Update(Self._table, Self).then(values => {
+              Self._setValues(values);
 
               // If there is a hook after save
-              if (!!Self.__proto__.schema.hooks.post.save)
-                Self.__proto__.schema.hooks.post.save(Self);
+              if (!!Self._schema.hooks.post.save)
+                Self._schema.hooks.post.save(Self);
 
               return !!callback ? callback(null, Self) : resolve(Self);
             }).catch(err => {
@@ -499,8 +506,8 @@ module.exports = (table, schema) => {
 
       return new Promise((resolve, reject) => {
         // If pre hook, exec the callback first
-        if (!!Self.__proto__.schema.hooks.pre.remove) {
-          Self.__proto__.schema.hooks.pre.remove(resolve);
+        if (!!Self._schema.hooks.pre.remove) {
+          Self._schema.hooks.pre.remove(resolve);
         }
         else {
           // Or resolve
@@ -509,13 +516,13 @@ module.exports = (table, schema) => {
       })
       .then(() => {
         return new Promise((resolve, reject) => {
-          Remove(Self.__proto__.table, this.id)
+          Remove(Self._table, this.id)
             .then(values => {
-              Self.__proto__._setValues(values);
+              Self._setValues(values);
 
               // If post hook
-              if (!!Self.__proto__.schema.hooks.post.remove) {
-                Self.__proto__.schema.hooks.post.remove(Self);
+              if (!!Self._schema.hooks.post.remove) {
+                Self._schema.hooks.post.remove(Self);
               }
               return !!callback ? callback(null, Self) : resolve(Self);
             })
@@ -544,8 +551,8 @@ module.exports = (table, schema) => {
 
       return new Promise((resolve, reject) => {
         // If has pre hook, exec the callback first
-        if (!!Self.__proto__.schema.hooks.pre.update) {
-          Self.__proto__.schema.hooks.pre.update(resolve);
+        if (!!Self._schema.hooks.pre.update) {
+          Self._schema.hooks.pre.update(resolve);
         }
         else {
           // Or resolve
@@ -553,12 +560,12 @@ module.exports = (table, schema) => {
         }
       })
       .then(() => {
-        Update(Self.__proto__.table, Self).then(values => {
-          Self.__proto__._setValues(values);
+        Update(Self._table, Self).then(values => {
+          Self._setValues(values);
 
           // If there is a hook after save
-          if (!!Self.__proto__.schema.hooks.post.save)
-            Self.__proto__.schema.hooks.post.save(Self);
+          if (!!Self._schema.hooks.post.save)
+            Self._schema.hooks.post.save(Self);
 
           return !!callback ? callback(null, Self) : resolve(Self);
         }).catch(err => {
@@ -568,31 +575,12 @@ module.exports = (table, schema) => {
     }
   }
 
-  tmpClass.__proto__.schema = schema;
-  tmpClass.__proto__.table = table;
-
-  // assign pre hooks
-  if (!!tmpClass.__proto__.schema.hooks.pre.init) {
-    const val = tmpClass.__proto__.schema.hooks.pre.init(tmpClass);
-    for (let field in val) {
-      tmpClass[field] = val[field];
-    }
-  }
-
-  // assign  post hooks
-  if (!!tmpClass.__proto__.schema.hooks.post.init) {
-    const val = tmpClass.__proto__.schema.hooks.post.init(tmpClass);
-    for (let field in val) {
-      tmpClass[field] = val[field];
-    }
-  }
-
   // Check if table exists
   TableExists(table).then(tableExists => {
     if (!tableExists)
-      CreateTable(table, tmpClass.__proto__.schema.paths);
+      CreateTable(table, schema.paths);
     else {
-      CheckColumns(table, tmpClass.__proto__.schema.paths)
+      CheckColumns(table, schema.paths)
         .then(schemaChanged => {
           if (schemaChanged.changed === true)
             throw new Error(localErrors.SchemaPathsHasChanged);
@@ -602,9 +590,9 @@ module.exports = (table, schema) => {
 
   // Bind static methods
   for (let i in schema.statics) {
-    tmpClass.__proto__[i] = schema.statics[i];
+    PostgooseModel[i] = schema.statics[i];
   }
 
   // Add new model in model collection
-  return ModelCollection.SetModel(table, tmpClass);
+  return ModelCollection.SetModel(table, PostgooseModel);
 };
