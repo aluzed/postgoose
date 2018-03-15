@@ -445,48 +445,27 @@ module.exports = (table, schema) => {
     save(callback) {
       const Self = this;
 
+      let saveObj = null;
+
+      if (!Self.id) {
+        saveObj = Insert(table, Self);
+      }
+      else {
+        saveObj = Update(table, Self);
+      }
+
+      saveObj._pre(schema.hooks.pre.save);
+      saveObj._post(schema.hooks.post.save);
+
+
       return new Promise((resolve, reject) => {
-        // If has pre hook, exec the callback first
-        if (!!Self._schema.hooks.pre.save) {
-          Self._schema.hooks.pre.save(resolve);
-        }
-        else {
-          // Or resolve
-          resolve();
-        }
-      })
-      .then(() => {
-        return new Promise((resolve, reject) => {
-          // Insert Case
-          if (!Self.id) {
-            Insert(Self._table, this).then(values => {
-              Self._setValues(values);
-
-              // If there is a hook after save
-              if (!!Self._schema.hooks.post.save)
-                Self._schema.hooks.post.save(Self);
-
-              return !!callback ? callback(null, Self) : resolve(Self);
-            }).catch(err => {
-              return !!callback ? callback(err) : reject(err);
-            });
-          }
-          // Update Case
-          else {
-            Update(Self._table, Self).then(values => {
-              Self._setValues(values);
-
-              // If there is a hook after save
-              if (!!Self._schema.hooks.post.save)
-                Self._schema.hooks.post.save(Self);
-
-              return !!callback ? callback(null, Self) : resolve(Self);
-            }).catch(err => {
-              return !!callback ? callback(err) : reject(err);
-            });
-          }
+        return saveObj.exec().then(row => {
+          return (!!callback) ? callback(null, row) : resolve(row);
         })
-      });
+          .catch(err => {
+            return (!!callback) ? callback(err) : reject(err);
+          });
+      })
     }
 
     /**
