@@ -22,7 +22,7 @@ const ModelCollection = require(path.join(__dirname, 'model-collection'));
 
 /**
  * localErrors
- *  
+ *
  * - ModelNotPersisted : model has not been persisted yet, so id column is missing.
  * - ModelAlreadyPersisted : model has already been persisted.
  * - ForbiddenColumnName : a column name is forbidden in schema definition.
@@ -43,7 +43,7 @@ const forbiddenColumns = [
 
 /**
  * Create an Array of conditions from an object { key: value }
- * 
+ *
  * @function _mapCriterias
  *
  * @param {Object} object
@@ -93,7 +93,7 @@ function _mapCriterias(object) {
 
 /**
  * Handles arguments and turn them into an object
- * 
+ *
  * @function _sanitizeArguments
  *
  * @param {Spread} args
@@ -205,8 +205,8 @@ module.exports = (table, schema) => {
     /**
      * Convert JS values to DB query format
      * @method valuesToDB
-     * 
-     * @param {Object} object 
+     *
+     * @param {Object} object
      * @return {Object}
      */
     valuesToDB() {
@@ -216,8 +216,8 @@ module.exports = (table, schema) => {
     /**
      * Convert DB values to JS format
      * @method valuesToJS
-     * 
-     * @param {Object} object 
+     *
+     * @param {Object} object
      * @return {Object}
      */
     valuesToJS() {
@@ -234,14 +234,14 @@ module.exports = (table, schema) => {
 
     /**
      * Retreive data from our database
-     * 
+     *
      * @method find
      * @static
      *
      * @param {Object} criteria
      * @param {Spread} args fields, order, callback
      * @return {Error|QueryObject|Promise}
-     */ 
+     */
     static find(criteria, ...args) {
 
       const conditions = _mapCriterias(criteria);
@@ -250,21 +250,28 @@ module.exports = (table, schema) => {
 
       const callback = params.callback;
 
-      let query = Select(table, schema, {
+      let selectObject = Select(table, schema, {
         where: conditions,
         fields: params.fields,
         order: params.order
       });
 
-      if (!!callback)
-        query.exec(callback);
-      else
-        return query;
+      selectObject._pre(schema.hooks.pre.find);
+      selectObject._post(schema.hooks.post.find);
+
+      return new Promise((resolve, reject) => {
+        return selectObject.exec().then(rows => {
+          return (!!callback) ? callback(null, rows) : resolve(rows);
+        })
+        .catch(err => {
+          return (!!callback) ? callback(err) : reject(err);
+        });
+      })
     }
 
     /**
-     * Retreive one row from our database 
-     * 
+     * Retreive one row from our database
+     *
      * @method findOne
      * @static
      *
@@ -280,26 +287,22 @@ module.exports = (table, schema) => {
 
       const callback = params.callback;
 
-      let query = SelectOne(table, schema, {
+      let selectOneObject = SelectOne(table, schema, {
         where: conditions,
         fields: params.fields
-      }).limit(1);
+      });
 
-      // Bind hooks
-      if (!!schema.hooks.pre.findOne)
-        query._pre(schema.hooks.pre.findOne);
-
-      if (!!schema.hooks.post.findOne)
-        query._post(schema.hooks.post.findOne);
+      selectOneObject._pre(schema.hooks.pre.findOne);
+      selectOneObject._post(schema.hooks.post.findOne);
 
       return new Promise((resolve, reject) => {
-        query.exec
+        return selectOneObject.exec().then(row => {
+          return (!!callback) ? callback(null, row) : resolve(row);
+        })
+        .catch(err => {
+          return (!!callback) ? callback(err) : reject(err);
+        });
       })
-
-      if (!!callback)
-        query.exec(callback);
-      else
-        return query;
     }
 
     /**
@@ -314,34 +317,34 @@ module.exports = (table, schema) => {
      */
      static findById(id, callback) {
 
-       let query = SelectOne(table, schema, {
+       let selectOneObject = SelectOne(table, schema, {
         where: [
-          table + '.id = ' + id
+          table.toLowerCase() + '.id = ' + id
         ]
-      }).limit(1);
+      });
 
-      // Bind hooks
-      if (!!schema.hooks.pre.findById)
-        query._pre(schema.hooks.pre.findById);
+      selectOneObject._pre(schema.hooks.pre.findById);
+      selectOneObject._post(schema.hooks.post.findById);
 
-      if (!!schema.hooks.post.findById)
-        query._post(schema.hooks.post.findById);
-
-      if (!!callback)
-        query.exec(callback);
-      else
-        return query;
+      return new Promise((resolve, reject) => {
+        return selectOneObject.exec().then(row => {
+          return (!!callback) ? callback(null, row) : resolve(row);
+        })
+        .catch(err => {
+          return (!!callback) ? callback(err) : reject(err);
+        });
+      })
     }
 
     /**
      * Retreive an item from our database and update it
-     * 
+     *
      * @method findByIdAndUpdate
      * @static
-     * 
-     * @param {Number} id 
+     *
+     * @param {Number} id
      * @param {Object} newValues
-     * @param {Function} callback 
+     * @param {Function} callback
      */
     static findByIdAndUpdate(id, newValues, callback) {
 
@@ -373,12 +376,12 @@ module.exports = (table, schema) => {
 
     /**
      * Retreive an item from our database and remove it
-     * 
+     *
      * @method findByIdAndRemove
      * @static
-     * 
-     * @param {Number} id 
-     * @param {Function} callback 
+     *
+     * @param {Number} id
+     * @param {Function} callback
      */
     static findByIdAndRemove(id, callback) {
 
@@ -410,10 +413,10 @@ module.exports = (table, schema) => {
 
     /**
      * Create Method
-     * 
+     *
      * @method create
-     * 
-     * @param {Function} callback 
+     *
+     * @param {Function} callback
      * @constraint this.id must be undefined
      * @throws {ModelAlreadyPersisted}
      */
@@ -436,11 +439,59 @@ module.exports = (table, schema) => {
     }
 
     /**
-     * Save Method
+     * RemoveAll Method
      * 
-     * @method save
+     * @method removeAll
      * 
+     * @param {Object} criteria
      * @param {Function} callback 
+     * @return {Error|QueryObject|Promise}
+     */
+    static removeAll(criteria, callback) {
+      const conditions = _mapCriterias(criteria);
+
+      const callback = params.callback;
+
+      let removeAllObject = RemoveAll(table, {
+        where: conditions,
+        fields: params.fields,
+        order: params.order
+      });
+
+      selectObject._pre(schema.hooks.pre.find);
+      selectObject._post(schema.hooks.post.find);
+
+      return new Promise((resolve, reject) => {
+        return selectObject.exec().then(rows => {
+          return (!!callback) ? callback(null, rows) : resolve(rows);
+        })
+          .catch(err => {
+            return (!!callback) ? callback(err) : reject(err);
+          });
+      })
+    }
+
+    /**
+     * updateAll Method
+     * 
+     * @method removeAll
+     * 
+     * @param {Object} criteria
+     * @param {Function} callback 
+     * @return {Error|QueryObject|Promise}
+     */
+    static updateAll(criteria, callback) {
+      const conditions = _mapCriterias(criteria);
+
+
+    }
+
+    /**
+     * Save Method
+     *
+     * @method save
+     *
+     * @param {Function} callback
      */
     save(callback) {
       const Self = this;
@@ -470,10 +521,10 @@ module.exports = (table, schema) => {
 
     /**
      * Remove method
-     * 
+     *
      * @method remove
-     * 
-     * @param {Function} callback 
+     *
+     * @param {Function} callback
      * @constraint this.id must exist
      * @throws {ModelNotPersisted}
      */
@@ -514,11 +565,11 @@ module.exports = (table, schema) => {
 
     /**
      * Update Method
-     * 
+     *
      * @method update
-     * 
+     *
      * @param {Object} newValues
-     * @param {*} callback 
+     * @param {*} callback
      * @constraint this.id must exist
      * @throws {ModelNotPersisted}
      */

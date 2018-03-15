@@ -55,6 +55,7 @@ module.exports = (table, model) => {
 
         // Check validators
         for (let field in _schema) {
+
           for (let v in _schema[field].validators) {
             let currentValidator = _schema[field].validators[v];
 
@@ -75,7 +76,7 @@ module.exports = (table, model) => {
             let currentInstance = _schema[field].instance;
 
             // Convert JS to DB
-            tmpValues = table.toLowerCase() + '.' + field + "=\'" + Types[currentInstance].toDB(model[field]) + "\'";
+            tmpValues += field + "=\'" + Types[currentInstance].toDB(model[field]) + "\'";
           }
         }
 
@@ -84,7 +85,8 @@ module.exports = (table, model) => {
         return query.run(tmpQuery)
           .then(response => {
             if(response.results.rows.length > 0) {
-              let item = new GetModel(table)(res.results.rows[0]);
+              let itemModel = GetModel(table);
+              let item = new itemModel(response.results.rows[0]);
 
               if (!!postCallback) {
                 postCallback = postCallback.bind(item);
@@ -102,7 +104,7 @@ module.exports = (table, model) => {
     })
   }
 
-  const updatetObject = {
+  const updateObject = {
     exec,
     _pre: callback => {
       preCallback = callback;

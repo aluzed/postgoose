@@ -38,17 +38,17 @@ module.exports = {
    *
    * @function GetModel
    *
-   * @param {String} name
+   * @param {String} table
    * @return {Object} model
    */
-   GetModel: (name) => {
-    if(typeof name === "undefined")
+   GetModel: (table) => {
+    if(typeof table === "undefined")
       throw new Error('Missing parameter');
 
-    if(typeof __models[name] === "undefined")
+    if(typeof __models[table] === "undefined")
       throw new Error(localErrors.ModelMissing);
 
-    return __models[name];
+    return __models[table];
   },
   /**
    * Returns the collections of models (read-only)

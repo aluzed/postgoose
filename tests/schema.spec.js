@@ -14,13 +14,14 @@ require('./helpers/dates');
 describe('Tests Schema', () => {
   let People = null;
   let Users = null;
+  let __user = null;
 
   before(() => {
     People = require(path.join(__dirname, 'models', 'people'));
     Users = require(path.join(__dirname, 'models', 'users'));
   })
 
-  it('Should clean our database', done =>  {
+  it('# postgoose.run', done =>  {
     Promise.all(
       [
         postgoose.run('TRUNCATE TABLE people; ALTER SEQUENCE people_id_seq RESTART WITH 1;'),
@@ -31,7 +32,7 @@ describe('Tests Schema', () => {
     });
   })
 
-  it('Should create people model', done => {
+  it('# schema.create People' => {
     const tmpPerson1 = {
       name: 'John Doe',
       age: 30
@@ -61,7 +62,7 @@ describe('Tests Schema', () => {
     })
   })
 
-  it('Should create users model', done => {
+  it('# schema.create Users', done => {
     const tmpUsers1 = {
       username: 'John Doe',
       password: 'qwerty',
@@ -92,6 +93,29 @@ describe('Tests Schema', () => {
     ).then(() => {
       done();
     })
+  })
+
+
+  it('# schema.findOne', done => {
+    Users.findOne().then(user => {
+      expect(user).to.not.be.null;
+      __user = user;
+      done();
+    })
+  });
+
+  it('# schema.find', done => {
+    Users.find().then(users => {
+      expect(users).to.have.property('length').to.equal(2);
+      done();
+    })
+  });
+
+  it('# schema.findById', done => {
+    Users.findById(__user.id, (err, user) => {
+      expect(err).to.be.null;
+      done();
+    });
   })
 
 });

@@ -26,21 +26,21 @@ const localErrors = {
 }
 
 /**
- * Generate a select object to retreive data easily
- * 
- * @function Select
- * 
- * @param {String} table 
- * @param {Object} schemaObject
- * @param {Object} options 
- * @return {Promise|Object}
- */
+* Generate a select object to retreive data easily
+*
+* @function Select
+*
+* @param {String} table
+* @param {Object} schemaObject
+* @param {Object} options
+* @return {Promise|Object}
+*/
 module.exports = (table, schemaObject, options) => {
   const schema = schemaObject.paths;
 
   let populated     = {};
 
-  let tmpQuery      = "SELECT ";
+  let tmpQuery      = "SELECT " + table.toLowerCase() + ".id, ";
   let tmpConditions = "";
   let tmpGroupBy    = "";
   let tmpOrder      = "";
@@ -48,19 +48,22 @@ module.exports = (table, schemaObject, options) => {
   let tmpOffset     = null;
   let tmpLeftJoin   = null;
 
+  let preCallback = null;
+  let postCallback = null;
+
   // Check if there is a pending condition
   let pendingCondition = false;
 
   // If there is no field specicied
-  if(typeof options.fields === "undefined") {
+  if (!options.fields) {
     for(let field in schema) {
-      tmpQuery += (tmpQuery === "SELECT ") ? (table.toLowerCase() + '.' + field) : (', ' + table.toLowerCase() + '.' + field);
+      tmpQuery += (tmpQuery === "SELECT " + table.toLowerCase() + ".id, ") ? (table.toLowerCase() + '.' + field) : (', ' + table.toLowerCase() + '.' + field);
     }
   }
   // Custom fields
   else {
     for(let field in options.fields) {
-      tmpQuery += (tmpQuery === "SELECT ") ? (table.toLowerCase() + '.' + field) : (', ' + table.toLowerCase() + '.' + field);
+      tmpQuery += (tmpQuery === "SELECT " + table.toLowerCase() + ".id, ") ? (table.toLowerCase() + '.' + field) : (', ' + table.toLowerCase() + '.' + field);
     }
   }
 
@@ -95,15 +98,15 @@ module.exports = (table, schemaObject, options) => {
   */
   function greater(val) {
     if(!pendingCondition)
-      return;
+    return;
 
     if(typeof val !== "Number")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' > ' + val;
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -120,15 +123,15 @@ module.exports = (table, schemaObject, options) => {
   */
   function lighter(val) {
     if(!pendingCondition)
-      return;
+    return;
 
     if(typeof val !== "Number")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' < ' + val;
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -145,13 +148,13 @@ module.exports = (table, schemaObject, options) => {
   */
   function isIn(array) {
     if(!pendingCondition)
-      return;
+    return;
 
     if(typeof array === "undefined")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     if(typeof array.splice === "undefined")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += '(';
 
@@ -162,13 +165,13 @@ module.exports = (table, schemaObject, options) => {
 
       // If there next value exists
       if(typeof arr[a + 1] !== "undefined")
-        tmpConditions += ', ';
+      tmpConditions += ', ';
     }
 
     tmpConditions += ')';
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -185,15 +188,15 @@ module.exports = (table, schemaObject, options) => {
   */
   function equals(val) {
     if(!pendingCondition)
-      return;
+    return;
 
     if(typeof val !== "string" && typeof val !== "number")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' = "' + val + '"';
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -212,15 +215,15 @@ module.exports = (table, schemaObject, options) => {
   */
   function between(a, b) {
     if(!pendingCondition)
-      return;
+    return;
 
     if(typeof a !== "number" || typeof b !== "number")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' BETWEEN ' + a + ' AND ' + b;
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -239,15 +242,15 @@ module.exports = (table, schemaObject, options) => {
   */
   function notbetween(a, b) {
     if(!pendingCondition)
-      return;
+    return;
 
     if(typeof a !== "number" || typeof b !== "number")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' NOT BETWEEN ' + a + ' AND ' + b;
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -267,17 +270,17 @@ module.exports = (table, schemaObject, options) => {
       for(let w in conditions) {
         tmpConditions += tmpConditions === "" ? conditions[w] : (" AND " + conditions[w]);
       }
-      return selectObject;
+      return this;
     }
     if(typeof conditions === "string") {
       // If current path does not exist (the field is not in current model)
       if(typeof schema[conditions] === "undefined")
-        return;
+      return;
 
       tmpConditions += (tmpConditions === "") ? (table.toLowerCase() + '.' + conditions) : (" AND " + table.toLowerCase() + '.' + conditions);
       pendingCondition = true;
 
-      return selectObject;
+      return this;
     }
 
     throw new Error(localErrors.paramTypeMismatch);
@@ -297,14 +300,14 @@ module.exports = (table, schemaObject, options) => {
   */
   function group(field) {
     if(typeof field !== "string")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     if(typeof schema[field] === "undefined")
-      throw new Error(localErrors.fieldNotFound);
+    throw new Error(localErrors.fieldNotFound);
 
     tmpGroupBy = field;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -320,16 +323,16 @@ module.exports = (table, schemaObject, options) => {
   */
   function sort(fields) {
     if(typeof fields === "undefined")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     // Sanitize object : turn -1 and 1 to DESC and ASC
     for(let f in fields) {
       switch(fields[f]) {
         case -1 :
-          fields[f] = 'DESC';
+        fields[f] = 'DESC';
         break;
         case 1 :
-          fields[f] = 'ASC';
+        fields[f] = 'ASC';
         break;
       }
     }
@@ -338,7 +341,7 @@ module.exports = (table, schemaObject, options) => {
       tmpOrder += (tmpOrder === "") ? (f + ' ' + fields[f]) : (", " + f + ' ' + fields[f]);
     }
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -354,11 +357,11 @@ module.exports = (table, schemaObject, options) => {
   */
   function limit(val) {
     if(typeof val !== "number")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     tmpLimit = val;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -374,11 +377,11 @@ module.exports = (table, schemaObject, options) => {
   */
   function skip(val) {
     if(typeof val !== "number")
-      throw new Error(localErrors.paramTypeMismatch);
+    throw new Error(localErrors.paramTypeMismatch);
 
     tmpOffset = val;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -394,12 +397,12 @@ module.exports = (table, schemaObject, options) => {
   */
   function populate(field) {
     if (typeof populated[field] !== "undefined")
-      return;
+    return;
 
     let fk = schema[field];
 
     if (fk.type !== Types.Id)
-      throw new Error(localErrors.fieldNotForeignKey);
+    throw new Error(localErrors.fieldNotForeignKey);
 
     let foreignTable = fk.ref.toLowerCase();
 
@@ -414,71 +417,90 @@ module.exports = (table, schemaObject, options) => {
 
     tmpLeftJoin += " LEFT JOIN "(fk.ref + ' ON ' + foreignTable + '.id = ' + table.toLowerCase() + '.' + field);
 
-    return selectObject;
+    return this;
   }
 
   /**
-   * Execute the query, if there are hooks, execute them too.
-   *
-   * @function exec
-   *
-   * @return {Promise}
-   */
-   function exec() {
+  * Execute the query, if there are hooks, execute them too.
+  *
+  * @function exec
+  *
+  * @return {Promise}
+  */
+  function exec() {
     // Forge query
+    tmpQuery += " FROM " + table.toLowerCase();
+    
     if(tmpLeftJoin !== null)
-      tmpQuery += tmpLeftJoin + " ";
+    tmpQuery += tmpLeftJoin + " ";
 
-    if(tmpConditions !== "")
+    if (tmpConditions !== "")
       tmpQuery += " WHERE " + tmpConditions;
 
-    tmpQuery += " FROM " + table.toLowerCase();
-
     if(tmpGroupBy !== "")
-      tmpQuery += " GROUP BY " + tmpGroupBy;
+    tmpQuery += " GROUP BY " + tmpGroupBy;
 
     if(tmpOrder !== "")
-      tmpQuery += " ORDER " + tmpOrder;
+    tmpQuery += " ORDER " + tmpOrder;
 
     if(tmpLimit !== null)
-      tmpQuery += " LIMIT " + tmpLimit;
+    tmpQuery += " LIMIT " + tmpLimit;
 
     if(tmpOffset !== null)
-      tmpQuery += " OFFSET " + tmpOffset;
+    tmpQuery += " OFFSET " + tmpOffset;
 
-     return new Promise((resolve, reject) => {
-       const query = new Query();
-       return query.run(tmpQuery)
+    return new Promise((resolve, reject) => {
+
+      return new Promise((res, rej) => {
+        if(!!preCallback) {
+          preCallback = preCallback.bind(model);
+          return preCallback(res);
+        }
+        else return res();
+      })
+      .then(() => {
+        const query = new Query();
+
+        return query.run(tmpQuery)
         .then(response => {
+          let items = response.results.rows.length > 0 ? [] : null;
+          let itemModel = GetModel(table);
+
           // Turn response objects into models
-          for (let r in response.results) {
-            response.results[r] = new GetModel(table)(resposne.results[r]);
+          response.results.rows.map(r => {
+            items.push(new itemModel(r));
+          });
+
+          if (!!postCallback) {
+            postCallback(items);
           }
 
-          return resolve(response.results);
+          return resolve(items);
         })
         .catch(err => {
           return reject(err);
         });
-     });
+      })
+
+    });
 
   }
 
   // Conditions
   if(!!options.where)
-    where(options.where);
+  where(options.where);
 
   if(!!options.group)
-    group(options.group);
+  group(options.group);
 
   if(!!options.order)
-    sort(options.order);
+  sort(options.order);
 
   if(!!options.limit)
-    limit(options.limit);
+  limit(options.limit);
 
   if(!!options.offset)
-    skip(options.offset);
+  skip(options.offset);
 
   const selectObject = {
     sort,
@@ -496,7 +518,13 @@ module.exports = (table, schemaObject, options) => {
     offset: skip, // Alias
     populate,
     populated: () => Object.assign({}, populated),
-    exec
+    exec,
+    _pre: callback => {
+      preCallback = callback;
+    },
+    _post: callback => {
+      postCallback = callback;
+    }
   };
 
   return selectObject;

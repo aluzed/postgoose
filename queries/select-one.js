@@ -27,12 +27,12 @@ const localErrors = {
 
 /**
  * Generate a select object to retreive a row easily
- * 
+ *
  * @function Select
- * 
- * @param {String} table 
+ *
+ * @param {String} table
  * @param {Object} schemaObject
- * @param {Object} options 
+ * @param {Object} options
  * @return {Promise|Object}
  */
 module.exports = (table, schemaObject, options) => {
@@ -40,7 +40,7 @@ module.exports = (table, schemaObject, options) => {
 
   let populated     = {};
 
-  let tmpQuery      = "SELECT ";
+  let tmpQuery      = "SELECT " + table.toLowerCase() + ".id, ";
   let tmpConditions = "";
   let tmpGroupBy    = "";
   let tmpOrder      = "";
@@ -48,19 +48,22 @@ module.exports = (table, schemaObject, options) => {
   let tmpOffset     = null;
   let tmpLeftJoin   = null;
 
+  let preCallback = null;
+  let postCallback = null;
+
   // Check if there is a pending condition
   let pendingCondition = false;
 
   // If there is no field specicied
-  if(typeof options.fields === "undefined") {
+  if(!options.fields) {
     for(let field in schema) {
-      tmpQuery += (tmpQuery === "SELECT ") ? (table.toLowerCase() + '.' + field) : (', ' + table.toLowerCase() + '.' + field);
+      tmpQuery += (tmpQuery === "SELECT " + table.toLowerCase() + ".id, ") ? (table.toLowerCase() + '.' + field) : (', ' + table.toLowerCase() + '.' + field);
     }
   }
   // Custom fields
   else {
     for(let field in options.fields) {
-      tmpQuery += (tmpQuery === "SELECT ") ? (table.toLowerCase() + '.' + field) : (', ' + table.toLowerCase() + '.' + field);
+      tmpQuery += (tmpQuery === "SELECT " + table.toLowerCase() + ".id, ") ? (table.toLowerCase() + '.' + field) : (', ' + table.toLowerCase() + '.' + field);
     }
   }
 
@@ -103,7 +106,7 @@ module.exports = (table, schemaObject, options) => {
     tmpConditions += ' > ' + val;
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -128,7 +131,7 @@ module.exports = (table, schemaObject, options) => {
     tmpConditions += ' < ' + val;
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -168,7 +171,7 @@ module.exports = (table, schemaObject, options) => {
     tmpConditions += ')';
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -193,7 +196,7 @@ module.exports = (table, schemaObject, options) => {
     tmpConditions += ' = "' + val + '"';
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -220,7 +223,7 @@ module.exports = (table, schemaObject, options) => {
     tmpConditions += ' BETWEEN ' + a + ' AND ' + b;
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -247,7 +250,7 @@ module.exports = (table, schemaObject, options) => {
     tmpConditions += ' NOT BETWEEN ' + a + ' AND ' + b;
     pendingCondition = false;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -267,7 +270,7 @@ module.exports = (table, schemaObject, options) => {
       for(let w in conditions) {
         tmpConditions += tmpConditions === "" ? conditions[w] : (" AND " + conditions[w]);
       }
-      return selectObject;
+      return this;
     }
     if(typeof conditions === "string") {
       // If current path does not exist (the field is not in current model)
@@ -277,34 +280,10 @@ module.exports = (table, schemaObject, options) => {
       tmpConditions += (tmpConditions === "") ? (table.toLowerCase() + '.' + conditions) : (" AND " + table.toLowerCase() + '.' + conditions);
       pendingCondition = true;
 
-      return selectObject;
+      return this;
     }
 
     throw new Error(localErrors.paramTypeMismatch);
-  }
-
-  /**
-  * @entry group
-  * @type Select Function
-  *
-  * Group results
-  *
-  * @param {String} field
-  * @return {Object} selectObject
-  * @constraint field must be type of String
-  * @constraint field must exist in current schema
-  * @throws {paramTypeMismatch|fieldNotFound}
-  */
-  function group(field) {
-    if(typeof field !== "string")
-      throw new Error(localErrors.paramTypeMismatch);
-
-    if(typeof schema[field] === "undefined")
-      throw new Error(localErrors.fieldNotFound);
-
-    tmpGroupBy = field;
-
-    return selectObject;
   }
 
   /**
@@ -338,7 +317,7 @@ module.exports = (table, schemaObject, options) => {
       tmpOrder += (tmpOrder === "") ? (f + ' ' + fields[f]) : (", " + f + ' ' + fields[f]);
     }
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -358,7 +337,7 @@ module.exports = (table, schemaObject, options) => {
 
     tmpOffset = val;
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -394,7 +373,7 @@ module.exports = (table, schemaObject, options) => {
 
     tmpLeftJoin += " LEFT JOIN "(fk.ref + ' ON ' + foreignTable + '.id = ' + table.toLowerCase() + '.' + field);
 
-    return selectObject;
+    return this;
   }
 
   /**
@@ -407,13 +386,14 @@ module.exports = (table, schemaObject, options) => {
   */
   function exec() {
     // Forge query
+    tmpQuery += " FROM " + table.toLowerCase();
+    
     if(tmpLeftJoin !== null)
       tmpQuery += tmpLeftJoin + " ";
 
-    if(tmpConditions !== "")
-      tmpQuery += " WHERE " + tmpConditions;
 
-    tmpQuery += " FROM " + table.toLowerCase();
+    if (tmpConditions !== "")
+      tmpQuery += " WHERE " + tmpConditions;
 
     if(tmpGroupBy !== "")
       tmpQuery += " GROUP BY " + tmpGroupBy;
@@ -421,27 +401,43 @@ module.exports = (table, schemaObject, options) => {
     if(tmpOrder !== "")
       tmpQuery += " ORDER " + tmpOrder;
 
-    if(tmpLimit !== null)
-      tmpQuery += " LIMIT " + tmpLimit;
+    tmpQuery += " LIMIT 1";
 
     if(tmpOffset !== null)
       tmpQuery += " OFFSET " + tmpOffset;
 
     return new Promise((resolve, reject) => {
-      const query = new Query();
-      query.run(tmpQuery)
-        .then(response => {
 
-          // Turn response objects into models
-          for (let r in response.results) {
-            response.results[r] = new GetModel(table)(resposne.results[r]);
-          }
+      return new Promise((res, rej) => {
+        if(!!preCallback) {
+          preCallback = preCallback.bind(model);
+          return preCallback(res);
+        }
+        else return res();
+      })
+      .then(() => {
+        const query = new Query();
+        query.run(tmpQuery)
+          .then(response => {
+            let item = null;
 
-          return resolve(response.results);
-        })
-        .catch(err => {
-          return reject(err);
-        });
+            if(response.results.rows.length === 1) {
+              let itemModel = GetModel(table);
+              item = new itemModel(response.results.rows[0]);
+            }
+
+            if (!!postCallback) {
+              postCallback = postCallback.bind(item);
+              postCallback(item);
+            }
+
+            return resolve(item);
+          })
+          .catch(err => {
+            return reject(err);
+          });
+      })
+
     });
 
   }
@@ -456,7 +452,7 @@ module.exports = (table, schemaObject, options) => {
   if(!!options.offset)
     skip(options.offset);
 
-  const selectObject = {
+  const selectOneObject = {
     sort,
     order: sort, // Alias
     where,
@@ -470,8 +466,14 @@ module.exports = (table, schemaObject, options) => {
     offset: skip, // Alias
     populate,
     populated: () => Object.assign({}, populated),
-    exec
+    exec,
+    _pre: callback => {
+      preCallback = callback;
+    },
+    _post: callback => {
+      postCallback = callback;
+    }
   };
 
-  return selectObject;
+  return selectOneObject;
 };

@@ -15,12 +15,11 @@ const { GetModel } = require(path.join(__dirname, '..', 'model', 'model-collecti
 
 /**
  * Insert a new row
- * 
+ *
  * @function Insert
- * 
+ *
  * @param {String} table Table name
  * @param {Object} model Model Object
- * @param {Object} item Data
  * @return {Promise}
  */
 module.exports = (table, model) => {
@@ -51,10 +50,9 @@ module.exports = (table, model) => {
       })
       .then(() => {
         let query = new Query();
-
         for (let field in schema) {
 
-          // Check validators 
+          // Check validators
           for (let v in schema[field].validators) {
             let currentValidator = schema[field].validators[v];
 
@@ -114,10 +112,10 @@ module.exports = (table, model) => {
             return reject(err);
           });
       })
-     
+
     });
   }
-  
+
   const insertObject = {
     exec,
     _pre: callback => {
