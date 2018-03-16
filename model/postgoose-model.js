@@ -30,8 +30,10 @@ const ModelCollection = require(path.join(__dirname, 'model-collection'));
 const localErrors = {
   ModelNotPersisted     : 'Error, model has not been persisted yet',
   ModelAlreadyPersisted : 'Error, model has already been persisted',
+  ItemNotFound          : 'Error, item not found',
   ForbiddenColumnName   : 'Error, forbidden column name',
-  SchemaPathsHasChanged : 'Error, schema paths has changed please delete the table to refresh it or use old schema'
+  SchemaPathsHasChanged : 'Error, schema paths has changed please delete the table to refresh it or use old schema',
+  BadCallbackFormat     : 'Error bad callback format'
 };
 
 const forbiddenColumns = [
@@ -61,10 +63,10 @@ function _mapCriterias(object) {
       for (let i in value) {
         switch (i) {
           case '$lt':
-            tmpWhere.push(key + ' < ' + value[i]);
+            tmpWhere.push(key + ' < ' + "'" + value[i]) + "'";
             break;
           case '$gt':
-            tmpWhere.push(key + ' > ' + value[i]);
+            tmpWhere.push(key + ' > ' + "'" + value[i]) + "'";
             break;
           case '$in':
             let newCondition = key + ' IN (';
@@ -83,9 +85,35 @@ function _mapCriterias(object) {
         }
       }
     }
-
-    if (typeof value === "string" || typeof value === "number")
-      tmpWhere.push(key + ' = ' + value);
+    else {
+      if(key.match(/\slike$/)) {
+        tmpWhere.push(key.split(' ')[0] + ' LIKE ' + "'" + value + "'");
+      }
+      else if(key.match(/\silike$/)) {
+        tmpWhere.push('LOWER(' + key.split(' ')[0] + ') LIKE LOWER(' + "'" + value + "')");
+      }
+      else if(key.match(/\s\>$/)) {
+        tmpWhere.push(key.split(' ')[0] + ' > ' + value);
+      }
+      else if(key.match(/\s\<$/)) {
+        tmpWhere.push(key.split(' ')[0] + ' < ' + value);
+      }
+      else if(key.match(/\s\>\=$/)) {
+        tmpWhere.push(key.split(' ')[0] + ' >= ' + value);
+      }
+      else if(key.match(/\s\<\=$/)) {
+        tmpWhere.push(key.split(' ')[0] + ' <= ' + value);
+      }
+      else if(key.match(/\s\<\>$/)) {
+        tmpWhere.push(key.split(' ')[0] + ' <> ' + "'" + value + "'");
+      }
+      else if(key.match(/\s\!\=$/)) {
+        tmpWhere.push(key.split(' ')[0] + ' != ' + "'" + value + "'");
+      }
+      else {
+        tmpWhere.push(key + ' = ' + value);
+      }
+    }
   }
 
   return tmpWhere;
@@ -99,27 +127,39 @@ function _mapCriterias(object) {
  * @param {Spread} args
  * @return {Object} { fields, callback }
  */
-function _sanitizeArguments(...args) {
+function _sanitizeArguments(args) {
+  args = args || [];
+
   let fields = null;
   let order = null;
   let callback = null;
 
-  for (let i in args) {
-    // If this is a function, assign our callback
-    if (typeof args[i] === 'function') {
-      callback = args[i];
-    }
-    else {
-      switch (i) {
-        case 0:
-          fields = args[0];
-          break;
-        case 1:
-          if (typeof args[1].sort !== "undefied")
-            order = args[1].sort;
-          break;
-      }
-    }
+  switch(args.length) {
+    case 1: 
+      if(typeof args[0] === "function")
+        callback = args[0];
+      else 
+        fields = args[0];
+    break;
+
+    case 2:
+      fields = args[0];
+
+      if(typeof args[1] === "function") 
+        callback = args[1];
+      else 
+        order = args[1];
+    break;
+
+    case 3:
+      fields = args[0]
+      order = args[1];
+
+      if(typeof args[2] === "function")
+        callback = args[2];
+      else 
+        throw new Error(localErrors.BadCallbackFormat);
+    break;
   }
 
   return {
@@ -248,7 +288,7 @@ module.exports = (table, schema) => {
 
       const params = _sanitizeArguments(args);
 
-      const callback = params.callback;
+      const cb = params.callback;
 
       let selectObject = Select(table, schema, {
         where: conditions,
@@ -261,10 +301,10 @@ module.exports = (table, schema) => {
 
       return new Promise((resolve, reject) => {
         return selectObject.exec().then(rows => {
-          return (!!callback) ? callback(null, rows) : resolve(rows);
+          return (!!cb) ? cb(null, rows) : resolve(rows);
         })
         .catch(err => {
-          return (!!callback) ? callback(err) : reject(err);
+          return (!!cb) ? cb(err) : reject(err);
         });
       })
     }
@@ -285,7 +325,7 @@ module.exports = (table, schema) => {
 
       const params = _sanitizeArguments(args);
 
-      const callback = params.callback;
+      const cb = params.callback;
 
       let selectOneObject = SelectOne(table, schema, {
         where: conditions,
@@ -297,10 +337,10 @@ module.exports = (table, schema) => {
 
       return new Promise((resolve, reject) => {
         return selectOneObject.exec().then(row => {
-          return (!!callback) ? callback(null, row) : resolve(row);
+          return (!!cb) ? cb(null, row) : resolve(row);
         })
         .catch(err => {
-          return (!!callback) ? callback(err) : reject(err);
+          return (!!cb) ? cb(err) : reject(err);
         });
       })
     }
@@ -311,13 +351,13 @@ module.exports = (table, schema) => {
      * @method findById
      * @static
      *
-     * @param {Number} id
-     * @param {Function} callback
+     * @param {Number} id item ID
+     * @param {Function} cb Callback
      * @return {Error|QueryObject|Promise}
      */
-     static findById(id, callback) {
+    static findById(id, cb) {
 
-       let selectOneObject = SelectOne(table, schema, {
+      let selectOneObject = SelectOne(table, schema, {
         where: [
           table.toLowerCase() + '.id = ' + id
         ]
@@ -328,10 +368,10 @@ module.exports = (table, schema) => {
 
       return new Promise((resolve, reject) => {
         return selectOneObject.exec().then(row => {
-          return (!!callback) ? callback(null, row) : resolve(row);
+          return (!!cb) ? cb(null, row) : resolve(row);
         })
         .catch(err => {
-          return (!!callback) ? callback(err) : reject(err);
+          return (!!cb) ? cb(err) : reject(err);
         });
       })
     }
@@ -342,36 +382,44 @@ module.exports = (table, schema) => {
      * @method findByIdAndUpdate
      * @static
      *
-     * @param {Number} id
-     * @param {Object} newValues
-     * @param {Function} callback
+     * @param {Number} id item ID
+     * @param {Object} newValues Values
+     * @param {Function} cb Callback
      */
-    static findByIdAndUpdate(id, newValues, callback) {
+    static findByIdAndUpdate(id, newValues, cb) {
 
-      let query = SelectOne(table, schema, {
-        where: [
-          table + '.id = ' + id
-        ]
-      }).limit(1);
+      const Self = this;
 
       return new Promise((resolve, reject) => {
-        query.exec((err, item) => {
-          if(err)
-            return !!callback ? callback(err) : reject(err);
-        });
+        Self
+          .findById(id).then(item => {
+            if(!item)
+              return !!cb ? cb(new Error(localErrors.ItemNotFound)) : reject(new Error(localErrors.ItemNotFound));
 
-        if(!!item) {
-          item.update(newValues, callback)
-            .then(item => {
-              return !!callback ? callback(null, item) : resolve(item);
-            })
-            .catch(err => {
-              return !!callback ? callback(err) : reject(err);
-            })
-        }
+            for (let key in newValues) {
+              item[key] = newValues[key];
+            }
 
-        !!callback ? callback(null, {}) : resolve();
-      })
+            let updateObj = Update(table, item);
+
+            updateObj._pre(schema.hooks.pre.findByIdAndUpdate);
+            updateObj._post(schema.hooks.post.findByIdAndUpdate);
+
+            return new Promise((resolve, reject) => {
+              return updateObj.exec().then(row => {
+                return (!!cb) ? cb(null, row) : resolve(row);
+              })
+                .catch(err => {
+                  return (!!cb) ? cb(err) : reject(err);
+                });
+            });
+            
+            return item.update(newValues, cb);
+          })
+          .catch(err => {
+            return !!cb ? cb(err) : reject(err);
+          })
+      });
     }
 
     /**
@@ -381,34 +429,37 @@ module.exports = (table, schema) => {
      * @static
      *
      * @param {Number} id
-     * @param {Function} callback
+     * @param {Function} cb
      */
-    static findByIdAndRemove(id, callback) {
-
-      let query = SelectOne(table, schema, {
-        where: [
-          table + '.id = ' + id
-        ]
-      }).limit(1);
+    static findByIdAndRemove(id, cb) {
+      const Self = this;
 
       return new Promise((resolve, reject) => {
-        query.exec((err, item) =>  {
-          if (err)
-            return !!callback ? callback(err) : reject(err);
-        });
+        Self
+          .findById(id).then(item => {
+            if (!item)
+              return !!cb ? cb(new Error(localErrors.ItemNotFound)) : reject(new Error(localErrors.ItemNotFound));
 
-        if (!!item) {
-          item.remove(callback)
-            .then(res => {
-              return !!callback ? callback(null, res) : resolve(res);
-            })
-            .catch(err => {
-              return !!callback ? callback(err) : reject(err);
-            })
-        }
+            let removeObj = Remove(table, item);
 
-        !!callback ? callback(null, {}) : resolve();
-      })
+            removeObj._pre(schema.hooks.pre.findByIdAndRemove);
+            removeObj._post(schema.hooks.post.findByIdAndRemove);
+
+            return new Promise((resolve, reject) => {
+              return removeObj.exec().then(row => {
+                return (!!cb) ? cb(null, row) : resolve(row);
+              })
+                .catch(err => {
+                  return (!!cb) ? cb(err) : reject(err);
+                });
+            });
+
+            return item.update(newValues, cb);
+          })
+          .catch(err => {
+            return !!cb ? cb(err) : reject(err);
+          })
+      });
     }
 
     /**
@@ -416,11 +467,12 @@ module.exports = (table, schema) => {
      *
      * @method create
      *
-     * @param {Function} callback
+     * @param {Object} item Values
+     * @param {Function} cb Callback
      * @constraint this.id must be undefined
      * @throws {ModelAlreadyPersisted}
      */
-    static create(item, callback)  {
+    static create(item, cb)  {
       let model = new this(item);
 
       let inserObj = Insert(table, model);
@@ -430,10 +482,10 @@ module.exports = (table, schema) => {
 
       return new Promise((resolve, reject) => {
         return inserObj.exec().then(row => {
-          return (!!callback) ? callback(null, row) : resolve(row);
+          return (!!cb) ? cb(null, row) : resolve(row);
         })
         .catch(err => {
-          return (!!callback) ? callback(err) : reject(err);
+          return (!!cb) ? cb(err) : reject(err);
         });
       })
     }
@@ -444,13 +496,11 @@ module.exports = (table, schema) => {
      * @method removeAll
      * 
      * @param {Object} criteria
-     * @param {Function} callback 
+     * @param {Function} cb 
      * @return {Error|QueryObject|Promise}
      */
-    static removeAll(criteria, callback) {
+    static removeAll(criteria, cb) {
       const conditions = _mapCriterias(criteria);
-
-      const callback = params.callback;
 
       let removeAllObject = RemoveAll(table, {
         where: conditions,
@@ -463,10 +513,10 @@ module.exports = (table, schema) => {
 
       return new Promise((resolve, reject) => {
         return selectObject.exec().then(rows => {
-          return (!!callback) ? callback(null, rows) : resolve(rows);
+          return (!!cb) ? cb(null, rows) : resolve(rows);
         })
           .catch(err => {
-            return (!!callback) ? callback(err) : reject(err);
+            return (!!cb) ? cb(err) : reject(err);
           });
       })
     }
@@ -491,9 +541,9 @@ module.exports = (table, schema) => {
      *
      * @method save
      *
-     * @param {Function} callback
+     * @param {Function} cb Callback
      */
-    save(callback) {
+    save(cb) {
       const Self = this;
 
       let saveObj = null;
@@ -511,10 +561,10 @@ module.exports = (table, schema) => {
 
       return new Promise((resolve, reject) => {
         return saveObj.exec().then(row => {
-          return (!!callback) ? callback(null, row) : resolve(row);
+          return (!!cb) ? cb(null, row) : resolve(row);
         })
           .catch(err => {
-            return (!!callback) ? callback(err) : reject(err);
+            return (!!cb) ? cb(err) : reject(err);
           });
       })
     }
@@ -524,43 +574,30 @@ module.exports = (table, schema) => {
      *
      * @method remove
      *
-     * @param {Function} callback
+     * @param {Function} cb Callback
      * @constraint this.id must exist
      * @throws {ModelNotPersisted}
      */
-    remove(callback) {
+    remove(cb) {
       const Self = this;
 
       if(typeof Self.id === "undefined")
         throw new Error(localErrors.ModelNotPersisted);
 
-      return new Promise((resolve, reject) => {
-        // If pre hook, exec the callback first
-        if (!!Self._schema.hooks.pre.remove) {
-          Self._schema.hooks.pre.remove(resolve);
-        }
-        else {
-          // Or resolve
-          resolve();
-        }
-      })
-      .then(() => {
-        return new Promise((resolve, reject) => {
-          Remove(Self._table, this.id)
-            .then(values => {
-              Self._setValues(values);
+      let removeObj = Remove(table, Self);
 
-              // If post hook
-              if (!!Self._schema.hooks.post.remove) {
-                Self._schema.hooks.post.remove(Self);
-              }
-              return !!callback ? callback(null, Self) : resolve(Self);
-            })
-            .catch(err => {
-              return !!callback ? callback(err) : reject(err);
-            });
+      removeObj._pre(schema.hooks.pre.remove);
+      removeObj._post(schema.hooks.post.remove);
+
+
+      return new Promise((resolve, reject) => {
+        return removeObj.exec().then(row => {
+          return (!!cb) ? cb(null, row) : resolve(row);
         })
-      });
+          .catch(err => {
+            return (!!cb) ? cb(err) : reject(err);
+          });
+      })
     }
 
     /**
@@ -569,39 +606,33 @@ module.exports = (table, schema) => {
      * @method update
      *
      * @param {Object} newValues
-     * @param {*} callback
+     * @param {*} cb Callback
      * @constraint this.id must exist
      * @throws {ModelNotPersisted}
      */
-    update(newValues, callback) {
+    update(newValues, cb) {
       const Self = this;
 
-      if (typeof Self.id === "undefined")
+      if (!Self.id)
         throw new Error(localErrors.ModelNotPersisted);
 
+      for(let key in newValues) {
+        Self[key] = newValues[key];
+      }
+
+      let updateObj = Update(table, Self);
+
+      updateObj._pre(schema.hooks.pre.update);
+      updateObj._post(schema.hooks.post.update);
+
       return new Promise((resolve, reject) => {
-        // If has pre hook, exec the callback first
-        if (!!Self._schema.hooks.pre.update) {
-          Self._schema.hooks.pre.update(resolve);
-        }
-        else {
-          // Or resolve
-          resolve();
-        }
-      })
-      .then(() => {
-        Update(Self._table, Self).then(values => {
-          Self._setValues(values);
-
-          // If there is a hook after save
-          if (!!Self._schema.hooks.post.save)
-            Self._schema.hooks.post.save(Self);
-
-          return !!callback ? callback(null, Self) : resolve(Self);
-        }).catch(err => {
-          return !!callback ? callback(err) : reject(err);
-        });
-      })
+        return updateObj.exec().then(row => {
+          return (!!cb) ? cb(null, row) : resolve(row);
+        })
+          .catch(err => {
+            return (!!cb) ? cb(err) : reject(err);
+          });
+      });
     }
   }
 

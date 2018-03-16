@@ -16,17 +16,15 @@ const { GetModel } = require('../model/model-collection');
  * @function Remove
  * 
  * @param {String} table 
- * @param {Number} id 
  * @param {Object} model Model Object
  * @return {Promise}
  */
-module.exports = (table, id, model) => {
+module.exports = (table, model) => {
     
-    let tmpQuery = 'DELETE FROM ' + table.toLowerCase() + ' WHERE id = ' + id;
+    let tmpQuery = 'DELETE FROM ' + table.toLowerCase() + ' WHERE id = ' + model.id;
     let preCallback = null;
     let postCallback = null;
         
-
     /**
      * Execute the query, if there are hooks, execute them too.
      *
@@ -45,6 +43,7 @@ module.exports = (table, id, model) => {
             })
             .then(() => {
                 const query = new Query();
+
                 return query
                     .run(tmpQuery)
                     .then(result => {

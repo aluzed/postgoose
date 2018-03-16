@@ -12,6 +12,8 @@ describe('Tests Postgoose', () => {
   // Connect to the databse
   before(done => {
     postgoose.connect(conf, () => {
+      require(path.join(__dirname, 'models', 'people'));
+      require(path.join(__dirname, 'models', 'users'));
       done();
     })
   });

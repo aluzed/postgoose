@@ -45,17 +45,43 @@ describe('Tests Model', () => {
       name: 'tata',
       details: 'fake user'
     };
-    _.assign(people, testValues);
 
-    people.save(err => {
+    _.assign(__people, testValues);
+
+    __people.save(err => {
       expect(err).to.be.null;
-      
+
       People.findById(__people.id, (err, people) => {
         expect(err).to.be.null;
-        expect(people).to.deep.include(testValues);
+        expect(people).to.deep.include(_.extend(testValues, { age: 32 }));
         done();
       });
     })
-  })
+  });
+
+  it('# model.update', done => {
+    __people.update({
+      name: 'titi'
+    }, (err, people) => {
+      expect(err).to.be.null;
+      expect(people).to.have.property('name').to.equal('titi');
+      done();
+    })
+  });
+
+  it('# model.remove', done => {
+    __people.remove().then(() => {
+      People.find({}, (err, people) => {
+        expect(err).to.be.null;
+        
+        let found = people.filter(p => {
+          return p.name === 'titi';
+        });
+
+        expect(found).to.have.property('length').to.equal(0);
+        done();
+      });
+    })
+  });
 
 });

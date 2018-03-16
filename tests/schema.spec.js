@@ -15,11 +15,12 @@ describe('Tests Schema', () => {
   let People = null;
   let Users = null;
   let __user = null;
+  let __people = null;
 
   before(() => {
-    People = require(path.join(__dirname, 'models', 'people'));
-    Users = require(path.join(__dirname, 'models', 'users'));
-  })
+    People = postgoose.model('People');
+    Users = postgoose.model('Users');
+  });
 
   it('# postgoose.run', done =>  {
     Promise.all(
@@ -30,9 +31,9 @@ describe('Tests Schema', () => {
     ).then(() => {
       done();
     });
-  })
+  });
 
-  it('# schema.create People' => {
+  it('# schema.create People', done => {
     const tmpPerson1 = {
       name: 'John Doe',
       age: 30
@@ -43,6 +44,11 @@ describe('Tests Schema', () => {
       age: 29
     };
 
+
+    const tmpPerson3 = {
+      name: 'Jerom Din',
+      age: 40
+    };
 
     Promise.all(
       [
@@ -55,12 +61,18 @@ describe('Tests Schema', () => {
           expect(person).to.deep.include(tmpPerson2);
           expect(person).to.have.property('created').to.not.be.null;
           expect(person).to.have.property('modified').to.not.be.null;
+        }),
+        People.create(tmpPerson3).then(person => {
+          __people = person;
+          expect(person).to.deep.include(tmpPerson3);
+          expect(person).to.have.property('created').to.not.be.null;
+          expect(person).to.have.property('modified').to.not.be.null;
         })
       ]
     ).then(() => {
       done();
     })
-  })
+  });
 
   it('# schema.create Users', done => {
     const tmpUsers1 = {
@@ -93,8 +105,7 @@ describe('Tests Schema', () => {
     ).then(() => {
       done();
     })
-  })
-
+  });
 
   it('# schema.findOne', done => {
     Users.findOne().then(user => {
@@ -111,11 +122,76 @@ describe('Tests Schema', () => {
     })
   });
 
+  it('# schema.find with criteria', done => {
+    Promise.all([
+      new Promise((res, rej) => {
+        People.find({ 'name like': '%Doe%' }, (err, people) => {
+          expect(err).to.be.null;
+          expect(people).to.have.property('length').to.equal(2);
+          return res();
+        })
+      }),
+      new Promise((res, rej) => {
+        People.find({ 'name like': '%doe%' }, (err, people) => {
+          expect(err).to.be.null;
+          expect(people).to.be.null;
+          return res();
+        })
+      }),
+      new Promise((res, rej) => {
+        People.find({ 'name ilike': '%doe%' }, (err, people) => {
+          expect(err).to.be.null;
+          expect(people).to.have.property('length').to.equal(2);
+          return res();
+        })
+      })
+    ])
+    .then(() => {
+      done();
+    })
+  })
+
   it('# schema.findById', done => {
     Users.findById(__user.id, (err, user) => {
       expect(err).to.be.null;
       done();
     });
-  })
+  });
+
+  it('# schema.findByIdAndUpdate', done => {
+    Users.findByIdAndUpdate(__user.id, { username: 'Jacky Doe' }, (err, user) => {
+      expect(err).to.be.null;
+      expect(user).to.have.property('username').to.equal('Jacky Doe');
+      __user = user;
+      done();
+    })
+  });
+
+  it('# schema.findByIdAndRemove', done => {
+    // Delete Jerom Din
+    People.findByIdAndRemove(__people.id, (err) => {
+      expect(err).to.be.null;
+      
+      People.find({}, (err, people) => {
+        expect(err).to.be.null;
+
+        let found = people.filter(p => {
+          return p.username === 'Jerom Din';
+        });
+
+        expect(people).to.have.property('length').to.equal(2);
+        expect(found).to.have.property('length').to.equal(0);
+        done();
+      })
+    })
+  });
+
+  it('# schema.updateAll', done => {
+    // People.updateAll()
+  });
+
+  it('# schema.removeAll', done => {
+    done(new Error())
+  });
 
 });
