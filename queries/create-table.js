@@ -18,7 +18,7 @@ const Types   = require(path.join(__dirname, '..', 'schema', 'types'));
  * 
  * @param {String} table Table name
  * @param {Object} schemaPaths Each columns
- * @return {Promise}
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table, schemaPaths) => {
   let tmpQuery = "CREATE TABLE IF NOT EXISTS " + table.toLowerCase() + " (id " + Types['Id'].type;

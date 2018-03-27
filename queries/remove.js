@@ -17,7 +17,7 @@ const { GetModel } = require('../model/model-collection');
  * 
  * @param {String} table 
  * @param {Object} model Model Object
- * @return {Promise}
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table, model) => {
     
@@ -32,7 +32,7 @@ module.exports = (table, model) => {
      *
      * @return {Promise}
      */
-    function exec(callback) {
+    function exec() {
         return new Promise((resolve, reject) => {
             return new Promise((res, rej) => {
                 if (!!preCallback) {

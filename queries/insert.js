@@ -20,7 +20,7 @@ const { GetModel } = require(path.join(__dirname, '..', 'model', 'model-collecti
  *
  * @param {String} table Table name
  * @param {Object} model Model Object
- * @return {Promise}
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table, model) => {
   const schema = model._schema.paths;
@@ -36,7 +36,7 @@ module.exports = (table, model) => {
    *
    * @function exec
    *
-   * @return {Promise}
+   * @return {Promise} Bluebird Promise
    */
   function exec() {
     return new Promise((resolve, reject) => {

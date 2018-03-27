@@ -18,9 +18,9 @@ const { GetModel } = require(path.join(__dirname, '..', 'model', 'model-collecti
  * 
  * @function Update
  * 
- * @param {String} table 
- * @param {Object} model 
- * @return {Promise}
+ * @param {String} table Table name
+ * @param {Object} model key/values
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table, model) => {
   if(!model.id) 
@@ -35,10 +35,11 @@ module.exports = (table, model) => {
   let postCallback = null;
 
   /**
+   * Execute the query, if there are hooks, execute them too.
    * 
    * @function exec
    * 
-   * @return {Promise}
+   * @return {Promise} Bluebird Promise
    */
   function exec() {
     return new Promise((resolve, reject) => {

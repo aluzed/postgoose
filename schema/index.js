@@ -96,11 +96,11 @@ function fieldToPath(name, field) {
 const PostgooseSchema = class {
   /**
    * Schema Constructor
+   * - constraint each field type must exist in Postgoose.SChema.Types
    *
    * @constructor PostgooseSchema
    *
    * @param {Object} schema
-   * @constraint each field type must exist in Postgoose.SChema.Types
    */
   constructor(schema) {
     this.paths = {};
@@ -126,12 +126,12 @@ const PostgooseSchema = class {
 
   /**
    * Bind a pre hook to our schema
+   * - constraint hookType must be an allowed hook
    *
    * @function pre
    *
    * @param {String} hookType
    * @param {Function} callback
-   * @constraint hookType must be an allowed hook
    * @throws {UnknownHookType}
    */
   pre(hookType, callback) {
@@ -144,12 +144,12 @@ const PostgooseSchema = class {
 
   /**
    * Bind a post hook to our schema
+   * - constraint hookType must be an allowed hook
    *
    * @function post
    *
    * @param {String} hookType
    * @param {Function} callback
-   * @constraint hookType must be an allowed hook
    * @throws {UnknownHookType}
    */
   post(hookType, callback) {

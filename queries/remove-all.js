@@ -15,9 +15,9 @@ const { GetModel  } = require('../model/model-collection');
  * 
  * @function Remove
  * 
- * @param {String} table 
+ * @param {String} table Table name
  * @param {Object} model Model Object
- * @return {Promise}
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table, model) => {
 
@@ -26,17 +26,17 @@ module.exports = (table, model) => {
   let postCallback = null;
 
   /**
-  * @entry in
-  * @type Where Condition
-  *
-  * If the field has one of these values
-  *
-  * @param {Array} array
-  * @return {Object} selectObject
-  * @constraint pendingCondition**
-  * @constraint array must be type of Array
-  * @throws {paramTypeMismatch}
-  */
+   * If the field has one of these values
+   * - constraint pendingCondition
+   * - constraint array must be type of Array
+   * 
+   * @function in
+   *
+   *
+   * @param {Array} array
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function isIn(array) {
     if (!pendingCondition)
       return;
@@ -66,16 +66,15 @@ module.exports = (table, model) => {
   }
 
   /**
-  * @entry where
-  * @type Select Function
-  *
-  * Start a new conditions or a group of conditions
-  *
-  * @param {Array|String} conditions|field
-  * @return {Object} selectObject
-  * @constraint must be type of Array or String
-  * @throws {paramTypeMismatch}
-  */
+   * Start a new conditions or a group of conditions
+   * - constraint must be type of Array or String
+   *
+   * @function where
+   *
+   * @param {Array|String} conditions|field
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function where(conditions) {
     // If conditions is type of array
     if (typeof conditions.splice !== "undefined") {

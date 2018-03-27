@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "node ./node_modules/mocha/bin/_mocha ./tests/index.js --exit",
-    "dev:stats": "find . -name '*.js' -not -path './node_modules/*' -not -path './public/*' | xargs wc -l"
+    "dev:stats": "find . -name '*.js' -not -path './node_modules/*' -not -path './public/*' | xargs wc -l",
+    "doc": "rm -rf ./docs && jsdoc -t ./node_modules/ink-docstrap/template -r ./readme.md -c ./jsdoc.json -d docs .",
+    "doc-server": "http-server ./docs"
   },
   "repository": {
     "type": "git",
@@ -27,7 +29,11 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "http-server": "^0.11.1",
+    "ink-docstrap": "^1.3.2",
+    "jsdoc": "^3.5.5",
     "lodash": "^4.17.5",
+    "marked": "^0.3.19",
     "mocha": "^5.0.4"
   }
 }

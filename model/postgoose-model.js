@@ -11,6 +11,7 @@ const Promise      = require('bluebird');
 const Insert       = require(path.join(__dirname, '..', 'queries', 'insert'));
 const Update       = require(path.join(__dirname, '..', 'queries', 'update'));
 const Remove       = require(path.join(__dirname, '..', 'queries', 'remove'));
+const RemoveAll    = require(path.join(__dirname, '..', 'queries', 'remove-all'));
 const Select       = require(path.join(__dirname, '..', 'queries', 'select'));
 const SelectOne    = require(path.join(__dirname, '..', 'queries', 'select-one'));
 const Query        = require(path.join(__dirname, '..', 'queries', 'query'));
@@ -47,6 +48,7 @@ const forbiddenColumns = [
  * Create an Array of conditions from an object { key: value }
  *
  * @function _mapCriterias
+ * @private
  *
  * @param {Object} object
  * @return {Array} SQL conditions
@@ -123,6 +125,7 @@ function _mapCriterias(object) {
  * Handles arguments and turn them into an object
  *
  * @function _sanitizeArguments
+ * @private
  *
  * @param {Spread} args
  * @return {Object} { fields, callback }
@@ -174,9 +177,10 @@ module.exports = (table, schema) => {
   let PostgooseModel = class {
     /**
     * PostgooseModel Constructor
+    * 
     * @class PostgooseModel
     *
-    * @param {Object} modelObject
+    * @param {Object} modelObject key/value
     */
     constructor(modelObject) {
       this.id = null;
@@ -278,9 +282,10 @@ module.exports = (table, schema) => {
      * @method find
      * @static
      *
-     * @param {Object} criteria
+     * @param {Object} criteria Expected values
      * @param {Spread} args fields, order, callback
-     * @return {Error|QueryObject|Promise}
+     * @return {Promise} Bluebird Promise
+     * @throws {Error}
      */
     static find(criteria, ...args) {
 
@@ -315,9 +320,10 @@ module.exports = (table, schema) => {
      * @method findOne
      * @static
      *
-     * @param {Object} criteria
+     * @param {Object} criteria Expected values
      * @param {Spread} args fields, order, callback
-     * @return {Error|QueryObject|Promise}
+     * @return {Promise} Bluebird Promise
+     * @throws {Error}
      */
     static findOne(criteria, ...args) {
 
@@ -352,8 +358,9 @@ module.exports = (table, schema) => {
      * @static
      *
      * @param {Number} id item ID
-     * @param {Function} cb Callback
-     * @return {Error|QueryObject|Promise}
+     * @param {Function} cb (err, item) => { ... }
+     * @return {Promise} Bluebird Promise
+     * @throws {Error}
      */
     static findById(id, cb) {
 
@@ -384,10 +391,10 @@ module.exports = (table, schema) => {
      *
      * @param {Number} id item ID
      * @param {Object} newValues Values
-     * @param {Function} cb Callback
+     * @param {Function} cb (err, item) => { ... }
+     * @throws {Error}
      */
     static findByIdAndUpdate(id, newValues, cb) {
-
       const Self = this;
 
       return new Promise((resolve, reject) => {
@@ -428,8 +435,10 @@ module.exports = (table, schema) => {
      * @method findByIdAndRemove
      * @static
      *
-     * @param {Number} id
-     * @param {Function} cb
+     * @param {Number} id item ID
+     * @param {Function} cb (err, item) => { ... }
+     * @return {Promise} Bluebird Promise
+     * @throws {Error}
      */
     static findByIdAndRemove(id, cb) {
       const Self = this;
@@ -464,12 +473,13 @@ module.exports = (table, schema) => {
 
     /**
      * Create Method
+     * - constraint this.id must be undefined
      *
      * @method create
      *
      * @param {Object} item Values
      * @param {Function} cb Callback
-     * @constraint this.id must be undefined
+     * @return {Promise} Bluebird Promise
      * @throws {ModelAlreadyPersisted}
      */
     static create(item, cb)  {
@@ -495,9 +505,10 @@ module.exports = (table, schema) => {
      * 
      * @method removeAll
      * 
-     * @param {Object} criteria
-     * @param {Function} cb 
-     * @return {Error|QueryObject|Promise}
+     * @param {Object} criteria Expected values
+     * @param {Function} cb (err, item) => { ... }
+     * @return {Promise} Bluebird Promise
+     * @throws {Error}
      */
     static removeAll(criteria, cb) {
       const conditions = _mapCriterias(criteria);
@@ -522,18 +533,45 @@ module.exports = (table, schema) => {
     }
 
     /**
-     * updateAll Method
+     * UpdateAll Method
      * 
      * @method removeAll
+     * @static
      * 
-     * @param {Object} criteria
-     * @param {Function} callback 
-     * @return {Error|QueryObject|Promise}
+     * @param {Object} criteria Expected values
+     * @param {Object} newValues key/value
+     * @param {Function} cb (err, item) => { ... }
+     * @return {Promise} Bluebird Promise
+     * @throws {Error}
      */
-    static updateAll(criteria, callback) {
-      const conditions = _mapCriterias(criteria);
+    static updateAll(criteria, newValues, cb) {
+      const Self = this;
+      
+      return new Promise((resolve, reject) => {
+          Self
+            .find(criteria).then(items => {
+              if (!items)
+                return !!cb ? cb(null, []) : resolve([]);
 
+              items.map(item => {
+                for (let key in newValues) {
+                  item[key] = newValues[key];
+                }
+              })
 
+              return Promise.each(items, item => {
+                let updateAllObject = Update(table, item);
+
+                updateAllObject._pre(schema.hooks.pre.updateAll);
+                updateAllObject._post(schema.hooks.post.updateAll);
+
+                return updateAllObject.exec();
+              }).then(() => {
+                return !!cb ? cb(null, items) : resolve(items);
+              });
+            })
+            .catch(err => reject(err));
+      })
     }
 
     /**
@@ -541,7 +579,8 @@ module.exports = (table, schema) => {
      *
      * @method save
      *
-     * @param {Function} cb Callback
+     * @param {Function} cb (err, item) => { ... }
+     * @return {Promise} Bluebird Promise
      */
     save(cb) {
       const Self = this;
@@ -571,11 +610,12 @@ module.exports = (table, schema) => {
 
     /**
      * Remove method
+     * - constraint this.id must exist
      *
      * @method remove
      *
-     * @param {Function} cb Callback
-     * @constraint this.id must exist
+     * @param {Function} cb (err, item) => { ... }
+     * @return {Promise} Bluebird Promise
      * @throws {ModelNotPersisted}
      */
     remove(cb) {
@@ -602,12 +642,13 @@ module.exports = (table, schema) => {
 
     /**
      * Update Method
+     * - constraint this.id must exist
      *
      * @method update
      *
-     * @param {Object} newValues
-     * @param {*} cb Callback
-     * @constraint this.id must exist
+     * @param {Object} newValues key/value
+     * @param {*} cb (err, item) => { ... }
+     * @return {Promise} Bluebird Promise
      * @throws {ModelNotPersisted}
      */
     update(newValues, cb) {

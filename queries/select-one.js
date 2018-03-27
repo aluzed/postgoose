@@ -30,10 +30,10 @@ const localErrors = {
  *
  * @function Select
  *
- * @param {String} table
- * @param {Object} schemaObject
- * @param {Object} options
- * @return {Promise|Object}
+ * @param {String} table Table name
+ * @param {Object} schemaObject Schema
+ * @param {Object} options Conditions...
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table, schemaObject, options) => {
   const schema = schemaObject.paths;
@@ -85,17 +85,16 @@ module.exports = (table, schemaObject, options) => {
   */
 
   /**
-  * @entry gt
-  * @type Where Condition
-  *
-  * Greater than
-  *
-  * @param {Number} val
-  * @return {Object} selectObject
-  * @constraint pendingCondition**
-  * @constraint val must be type of array
-  * @throws {paramTypeMismatch}
-  */
+   * Greater than
+   * - constraint pendingCondition
+   * - constraint val must be type of array
+   * 
+   * @function greater
+   *
+   * @param {Number} val Value
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function greater(val) {
     if(!pendingCondition)
       return;
@@ -110,17 +109,18 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry lt
-  * @type Where Condition
-  *
-  * Lighter than
-  *
-  * @param {Number} val
-  * @return {Object} selectObject
-  * @constraint pendingCondition**
-  * @constraint val must be type of Number
-  * @throws {paramTypeMismatch}
-  */
+   * Lighter than
+   * 
+   * - constraint pendingCondition
+   * - constraint val must be type of Number
+   * 
+   * @function lt
+   *
+   *
+   * @param {Number} val Value
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function lighter(val) {
     if(!pendingCondition)
       return;
@@ -135,17 +135,16 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry in
-  * @type Where Condition
-  *
-  * If the field has one of these values
-  *
-  * @param {Array} array
-  * @return {Object} selectObject
-  * @constraint pendingCondition**
-  * @constraint array must be type of Array
-  * @throws {paramTypeMismatch}
-  */
+   * If the field has one of these values
+   * - constraint pendingCondition
+   * - constraint array must be type of Array
+   * 
+   * @function in
+   *
+   * @param {Array} array Array of values
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function isIn(array) {
     if(!pendingCondition)
       return;
@@ -175,17 +174,16 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry equals
-  * @type Where Condition
-  *
-  * If the field has this value
-  *
-  * @param {Number|String} val
-  * @return {Object} selectObject
-  * @constraint pendingCondition**
-  * @constraint val must be type of String or Number
-  * @throws {paramTypeMismatch}
-  */
+   * If the field has this value
+   * - constraint pendingCondition
+   * - constraint val must be type of String or Number
+   * 
+   * @function equals
+   *
+   * @param {Number|String} val
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function equals(val) {
     if(!pendingCondition)
       return;
@@ -200,20 +198,19 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry between
-  * @type Where Condition
-  *
-  * Get results between a and b for a given field
-  *
-  * @param {Number} a
-  * @param {Number} b
-  * @return {Object} selectObject
-  * @constraint pendingCondition**
-  * @constraint a must be type of Number
-  * @constraint b must be type of Number
-  * @throws {paramTypeMismatch}
-  */
-  function between(a, b) {
+   * Get results between a and b for a given field
+   * - constraint pendingCondition
+   * - constraint a must be type of Number
+   * - constraint b must be type of Number
+   * 
+   * @function between
+   *
+   * @param {Number} a Lower value
+   * @param {Number} b Greater value
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
+   function between(a, b) {
     if(!pendingCondition)
       return;
 
@@ -227,19 +224,18 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry notbetween
-  * @type Where Condition
-  *
-  * Get resulsts not between a and b for a given field
-  *
-  * @param {Number} a
-  * @param {Number} b
-  * @return {Object} selectObject
-  * @constraint pendingCondition**
-  * @constraint a must be type of Number
-  * @constraint b must be type of Number
-  * @throws {paramTypeMismatch}
-  */
+   * Get resulsts not between a and b for a given field
+   * @constraint pendingCondition**
+   * @constraint a must be type of Number
+   * @constraint b must be type of Number
+   *
+   * @function notbetween
+   *
+   * @param {Number} a Lower value
+   * @param {Number} b Greater value
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function notbetween(a, b) {
     if(!pendingCondition)
       return;
@@ -254,16 +250,15 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry where
-  * @type Select Function
-  *
-  * Start a new conditions or a group of conditions
-  *
-  * @param {Array|String} conditions|field
-  * @return {Object} selectObject
-  * @constraint must be type of Array or String
-  * @throws {paramTypeMismatch}
-  */
+   * Start a new conditions or a group of conditions
+   * - constraint must be type of Array or String
+   *
+   * @function where
+   *
+   * @param {Array|String} conditions|field
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function where(conditions) {
     // If conditions is type of array
     if(typeof conditions.splice !== "undefined") {
@@ -287,16 +282,15 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry sort
-  * @type Select Function
-  *
-  * Sort results
-  *
-  * @param {Object} fields { fieldName: 'ASC', fieldName: 'DESC' }
-  * @return {Object} selectObject
-  * @constraint fields must be type of Object
-  * @throws {paramTypeMismatch}
-  */
+   * Sort results
+   * - constraint fields must be type of Object
+   *
+   * @function sort
+   *
+   * @param {Object} fields { fieldName: 'ASC', fieldName: 'DESC' }
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function sort(fields) {
     if(typeof fields === "undefined")
       throw new Error(localErrors.paramTypeMismatch);
@@ -321,16 +315,16 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry skip
-  * @type Select Function
-  *
-  * Offset results
-  *
-  * @param {Number} val
-  * @return {Object} selectObject
-  * @constraint val must be type of Number
-  * @throws {paramTypeMismatch}
-  */
+   * Offset results
+   * - constraint val must be type of Number
+   * 
+   * @function skip
+   *
+   *
+   * @param {Number} val Value
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function skip(val) {
     if(typeof val !== "number")
       throw new Error(localErrors.paramTypeMismatch);
@@ -341,16 +335,15 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry populate
-  * @type Select Function
-  *
-  * Populate a foreign key
-  *
-  * @param {String} field
-  * @return {Object} selectObject
-  * @constraint field must be type of Id
-  * @throws {fieldNotForeignKey}
-  */
+   * Populate a foreign key
+   * - constraint field must be type of Id
+   * 
+   * @function populate
+   *
+   * @param {String} field Path to populate
+   * @return {Object} selectObject
+   * @throws {fieldNotForeignKey}
+   */
   function populate(field) {
     if (typeof populated[field] !== "undefined")
       return;
@@ -377,13 +370,12 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @entry skip
-  * @type Select Function
-  *
-  * Execute the query, if there are hooks, execute them too.
-  *
-  * @return {Promise}
-  */
+   * Execute the query, if there are hooks, execute them too.
+   *
+   * @function skip
+   *
+   * @return {Promise} Bluebird Promise
+   */
   function exec() {
     // Forge query
     tmpQuery += " FROM " + table.toLowerCase();

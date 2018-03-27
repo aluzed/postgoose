@@ -144,12 +144,41 @@ describe('Tests Schema', () => {
           expect(people).to.have.property('length').to.equal(2);
           return res();
         })
+      }),
+      new Promise((res, rej) => {
+        People.find({ 'age <': 30 }, (err, people) => {
+          expect(err).to.be.null;
+          expect(people).to.have.property('length').to.equal(1);
+          return res();
+        })
+      }),
+      new Promise((res, rej) => {
+        People.find({ 'age <=': 30 }, (err, people) => {
+          expect(err).to.be.null;
+          expect(people).to.have.property('length').to.equal(2);
+          return res();
+        })
+      }),
+      new Promise((res, rej) => {
+        People.find({ 'age >': 30 }, (err, people) => {
+          expect(err).to.be.null;
+          expect(people).to.have.property('length').to.equal(1);
+          expect(people[0].name).to.equal('Jerom Din');
+          return res();
+        })
+      }),
+      new Promise((res, rej) => {
+        People.find({ 'age >=': 29 }, (err, people) => {
+          expect(err).to.be.null;
+          expect(people).to.have.property('length').to.equal(3);
+          return res();
+        })
       })
     ])
     .then(() => {
       done();
     })
-  })
+  }).timeout(10 * 1000);
 
   it('# schema.findById', done => {
     Users.findById(__user.id, (err, user) => {
@@ -187,7 +216,12 @@ describe('Tests Schema', () => {
   });
 
   it('# schema.updateAll', done => {
-    // People.updateAll()
+    People.updateAll({ 'name ilike': '%doe%' }, { age: 50 }, (err, items) => {
+      expect(items).to.have.property('length').to.equal(2);
+      expect(items[0]).to.have.property('age').to.equal(50);
+      expect(items[1]).to.have.property('age').to.equal(50);
+      done();
+    })
   });
 
   it('# schema.removeAll', done => {

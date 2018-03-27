@@ -37,9 +37,9 @@ class Query {
    *
    * @function run
    *
-   * @param {String} queryStr
-   * @return {Promise}
-   * @throws {ConnectionNotInitialized}
+   * @param {String} queryStr SQL formatted query
+   * @return {Promise} Bluebird Promise
+   * @throws {ConnectionNotInitialized} 
    */
   run(queryStr) {
     this.refreshConnection();

@@ -14,8 +14,8 @@ const Query = require('./query');
  * 
  * @function TableExists
  * 
- * @param {String} table 
- * @return {Promise}
+ * @param {String} table Table name
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table) => {
   let tmpQuery = `SELECT * 

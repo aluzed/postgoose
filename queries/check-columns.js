@@ -21,7 +21,7 @@ function compareColumn(column, schemaPath) {
  * 
  * @param {String} table Table name
  * @param {Object} schemaPaths Each columns
- * @return {Promise}
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table, schemaPaths) => {
   let tmpQuery = `SELECT column_name, data_type     
