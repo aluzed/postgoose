@@ -17,7 +17,7 @@
     "postgresql",
     "mongoose"
   ],
-  "author": "Alexandre PENOMBRE",
+  "author": "Alexandre PENOMBRE <aluzed_AT_gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/aluzed/postgoose/issues"
