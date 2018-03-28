@@ -1,11 +1,11 @@
 /**
-* @module Queries
-* @resource Check Columns
+* @module Queries/CheckColumns
+* @ignore
 *
-* Check each columns and look if schema has changed
+* @description Check each columns and look if schema has changed
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const path  = require('path');
 const Query = require('./query');
@@ -16,14 +16,13 @@ function compareColumn(column, schemaPath) {
 }
 
 /**
- * @entry Check Columns
- * @type Query
- * 
  * Check each column of a given table and notify in case of change
  * 
- * @param {String} table 
- * @param {Object} schemaPaths 
- * @return {Promise}
+ * @function Check Columns
+ * 
+ * @param {String} table Table name
+ * @param {Object} schemaPaths Each columns
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table, schemaPaths) => {
   let tmpQuery = `SELECT column_name, data_type     
@@ -32,7 +31,7 @@ module.exports = (table, schemaPaths) => {
   return new Promise((resolve, reject) => {
     const query = new Query();
 
-    query
+    return query
       .run(tmpQuery)
       .then(response => {
         let changed = false;
@@ -43,21 +42,33 @@ module.exports = (table, schemaPaths) => {
 
           if(column.column_name !== "id") {
             let currentType = Types[schemaPaths[column.column_name].instance].type;
-  
-            if(column.data_type !== currentType) {
-              changed = true;
-              chagnedFields.push(column.column_name);
+
+            switch (column.data_type) {
+              // String case
+              case "character varying":
+                if (currentType !== "varchar(255)") {
+                  changed = true;
+                  chagnedFields.push(column.column_name);
+                }
+              break;
+              // Default
+              default: 
+                if (column.data_type !== currentType) {
+                  changed = true;
+                  chagnedFields.push(column.column_name);
+                }
+              break;
             }
           }
         }
         
-        resolve({
+        return resolve({
           changed,
           chagnedFields
         });
       })
       .catch(err => {
-        reject(err);
+        return reject(err);
       });
   });
 }

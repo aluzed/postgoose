@@ -1,11 +1,11 @@
 /**
-* @module Queries
-* @resource Create Table
+* @module Queries/CreateTable
+* @ignore
 *
-* Create a table in our Postgresql database
+* @description Create a table in our Postgresql database
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const path    = require('path');
 const Query   = require('./query');
@@ -13,14 +13,13 @@ const Promise = require('bluebird');
 const Types   = require(path.join(__dirname, '..', 'schema', 'types'));
 
 /**
- * @entry Create Table
- * @type Query
- * 
  * Generate the table in our database
  * 
- * @param {String} table 
- * @param {Object} schemaPaths 
- * @return {Promise}
+ * @function CreateTable
+ * 
+ * @param {String} table Table name
+ * @param {Object} schemaPaths Each columns
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table, schemaPaths) => {
   let tmpQuery = "CREATE TABLE IF NOT EXISTS " + table.toLowerCase() + " (id " + Types['Id'].type;
@@ -47,13 +46,13 @@ module.exports = (table, schemaPaths) => {
   return new Promise((resolve, reject) => {
     const query = new Query();
   
-    query
+    return query
       .run(tmpQuery)
       .then(response => {
-        resolve(true);
+        return resolve(true);
       })
       .catch(err => {
-        reject(err);
+        return reject(err);
       })
   });
 };

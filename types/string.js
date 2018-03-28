@@ -12,7 +12,9 @@ module.exports = class PgString {
   }
 
   static toDB(val) {
-    return val.substring(0, 255);
+    if(!!val)
+      return val.substring(0, 255);
+    else return val;
   }
 
   static toJS(val) {

@@ -1,33 +1,36 @@
 /**
- * @module Core
- * @resource PostgooseSchema
+ * @module Core/PostgooseSchema/HooksList
  * 
+ * @description List of all hooks
  * 
+ * @copyright 2018
+ * @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
  */
 
 /**
-* @entry hooksList
-* @position before
-*
 * List of allowed hooks :
 * - create
 * - save
 * - update
+* - updateAll
 * - remove
+* - removeAll
 * - find
 * - findByIdAndUpdate
 * - findByIdAndRemove
 * - findById
 * - findOne
 */
-module.exports = {
-  create            : 'CREATE_HOOK',
-  save              : 'SAVE_HOOK',
-  update            : 'UPDATE_HOOK',
-  remove            : 'REMOVE_HOOK',
-  find              : 'FIND_HOOK',
-  findByIdAndUpdate : 'FINDBYIDANDUPDATE_HOOK',
-  findByIdAndRemove : 'FINDBYIDANDREMOVE_HOOK',
-  findById          : 'FINDBYID_HOOK',
-  findOne           : 'FINDONE_HOOK'
-};
+const allowedHooks = [
+  'create',
+  'save',
+  'update',
+  'remove',
+  'find',
+  'findByIdAndUpdate',
+  'findByIdAndRemove',
+  'findById',
+  'findOne' 
+];
+
+module.exports = allowedHooks;

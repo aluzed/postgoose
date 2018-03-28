@@ -1,23 +1,21 @@
 /**
-* @module Queries
-* @resource Table Exists
+* @module Queries/TableExists
 *
-* Check if a table exists
+* @description Check if a table exists
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const path = require('path');
 const Query = require('./query');
 
 /**
- * @entry Table Exists
- * @type Query
- * 
  * Return if a table already exist or not
  * 
- * @param {String} table 
- * @return {Promise}
+ * @function TableExists
+ * 
+ * @param {String} table Table name
+ * @return {Promise} Bluebird Promise
  */
 module.exports = (table) => {
   let tmpQuery = `SELECT * 
@@ -27,15 +25,15 @@ module.exports = (table) => {
   return new Promise((resolve, reject) => {
     const query = new Query();
   
-    query
+    return query
       .run(tmpQuery)
       .then(response => {
-        resolve(
-          response.results.rows.find(r => r.tablename === table.toLowerCase()) 
+        return resolve(response.results.rows.find(r => 
+          r.tablename === table.toLowerCase() || null)
         );
       })
       .catch(err => {
-        reject(err);
+        return reject(err);
       });
   });
 }

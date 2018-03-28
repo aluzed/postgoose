@@ -1,9 +1,9 @@
 /**
-* @module Queries/Select
+* @module Queries/SelectOne
 *
-* @description Select data in our postgres database
+* @description Select a unique row in our postgres database
 *
-* @copyright 2018 
+* @copyright 2018
 * @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const path         = require('path');
@@ -26,15 +26,15 @@ const localErrors = {
 }
 
 /**
-* Generate a select object to retreive data easily
-*
-* @function Select
-*
-* @param {String} table
-* @param {Object} schemaObject
-* @param {Object} options
-* @return {Promise} Bluebird Promise
-*/
+ * Generate a select object to retreive a row easily
+ *
+ * @function Select
+ *
+ * @param {String} table Table name
+ * @param {Object} schemaObject Schema
+ * @param {Object} options Conditions...
+ * @return {Promise} Bluebird Promise
+ */
 module.exports = (table, schemaObject, options) => {
   const schema = schemaObject.paths;
 
@@ -55,7 +55,7 @@ module.exports = (table, schemaObject, options) => {
   let pendingCondition = false;
 
   // If there is no field specicied
-  if (!options.fields) {
+  if(!options.fields) {
     for(let field in schema) {
       tmpQuery += (tmpQuery === "SELECT " + table.toLowerCase() + ".id, ") ? (table.toLowerCase() + '.' + field) : (', ' + table.toLowerCase() + '.' + field);
     }
@@ -68,7 +68,8 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * @description pendingCondition
+  * @entry pendingCondition
+  * @position before
   *
   * Pending Condition is a boolean that means a condition is waiting for its details.
   * It means that you already type : where(field)
@@ -87,19 +88,19 @@ module.exports = (table, schemaObject, options) => {
    * Greater than
    * - constraint : pendingCondition
    * - constraint : val must be type of array
+   * 
+   * @function greater
    *
-  * @function gt
-  *
-  * @param {Number} val
-  * @return {Object} selectObject
-  * @throws {paramTypeMismatch}
-  */
+   * @param {Number} val Value
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function greater(val) {
     if(!pendingCondition)
-    return;
+      return;
 
     if(typeof val !== "Number")
-    throw new Error(localErrors.paramTypeMismatch);
+      throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' > ' + val;
     pendingCondition = false;
@@ -109,21 +110,23 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Lighter than
+   * 
    * - constraint : pendingCondition
    * - constraint : val must be type of Number
+   * 
+   * @function lt
    *
-  * @function lt
-  *
-  * @param {Number} val
-  * @return {Object} selectObject
-  * @throws {paramTypeMismatch}
-  */
+   *
+   * @param {Number} val Value
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function lighter(val) {
     if(!pendingCondition)
-    return;
+      return;
 
     if(typeof val !== "Number")
-    throw new Error(localErrors.paramTypeMismatch);
+      throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' < ' + val;
     pendingCondition = false;
@@ -135,22 +138,22 @@ module.exports = (table, schemaObject, options) => {
    * If the field has one of these values
    * - constraint : pendingCondition
    * - constraint : array must be type of Array
+   * 
+   * @function in
    *
-  * @function in
-  *
-  * @param {Array} array
-  * @return {Object} selectObject
-  * @throws {paramTypeMismatch}
-  */
+   * @param {Array} array Array of values
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function isIn(array) {
     if(!pendingCondition)
-    return;
+      return;
 
     if(typeof array === "undefined")
-    throw new Error(localErrors.paramTypeMismatch);
+      throw new Error(localErrors.paramTypeMismatch);
 
     if(typeof array.splice === "undefined")
-    throw new Error(localErrors.paramTypeMismatch);
+      throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += '(';
 
@@ -161,7 +164,7 @@ module.exports = (table, schemaObject, options) => {
 
       // If there next value exists
       if(typeof arr[a + 1] !== "undefined")
-      tmpConditions += ', ';
+        tmpConditions += ', ';
     }
 
     tmpConditions += ')';
@@ -174,7 +177,7 @@ module.exports = (table, schemaObject, options) => {
    * If the field has this value
    * - constraint : pendingCondition
    * - constraint : val must be type of String or Number
-   *
+   * 
    * @function equals
    *
    * @param {Number|String} val
@@ -183,10 +186,10 @@ module.exports = (table, schemaObject, options) => {
    */
   function equals(val) {
     if(!pendingCondition)
-    return;
+      return;
 
     if(typeof val !== "string" && typeof val !== "number")
-    throw new Error(localErrors.paramTypeMismatch);
+      throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' = "' + val + '"';
     pendingCondition = false;
@@ -199,20 +202,20 @@ module.exports = (table, schemaObject, options) => {
    * - constraint : pendingCondition
    * - constraint : a must be type of Number
    * - constraint : b must be type of Number
-   *
+   * 
    * @function between
    *
-   * @param {Number} a
-   * @param {Number} b
+   * @param {Number} a Lower value
+   * @param {Number} b Greater value
    * @return {Object} selectObject
    * @throws {paramTypeMismatch}
    */
-  function between(a, b) {
+   function between(a, b) {
     if(!pendingCondition)
-    return;
+      return;
 
     if(typeof a !== "number" || typeof b !== "number")
-    throw new Error(localErrors.paramTypeMismatch);
+      throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' BETWEEN ' + a + ' AND ' + b;
     pendingCondition = false;
@@ -221,24 +224,24 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-   * Get results not between a and b for a given field
-   * - constraint : pendingCondition
-   * - constraint : a must be type of Number
-   * - constraint : b must be type of Number
+   * Get resulsts not between a and b for a given field
+   * @constraint pendingCondition**
+   * @constraint a must be type of Number
+   * @constraint b must be type of Number
    *
    * @function notbetween
    *
-   * @param {Number} a
-   * @param {Number} b
+   * @param {Number} a Lower value
+   * @param {Number} b Greater value
    * @return {Object} selectObject
    * @throws {paramTypeMismatch}
    */
   function notbetween(a, b) {
     if(!pendingCondition)
-    return;
+      return;
 
     if(typeof a !== "number" || typeof b !== "number")
-    throw new Error(localErrors.paramTypeMismatch);
+      throw new Error(localErrors.paramTypeMismatch);
 
     tmpConditions += ' NOT BETWEEN ' + a + ' AND ' + b;
     pendingCondition = false;
@@ -267,11 +270,9 @@ module.exports = (table, schemaObject, options) => {
     if(typeof conditions === "string") {
       // If current path does not exist (the field is not in current model)
       if(typeof schema[conditions] === "undefined")
-      return;
+        return;
 
-      tmpConditions += (tmpConditions === "") ? 
-        (table.toLowerCase() + '.' + conditions) : 
-        (" AND " + table.toLowerCase() + '.' + conditions);
+      tmpConditions += (tmpConditions === "") ? (table.toLowerCase() + '.' + conditions) : (" AND " + table.toLowerCase() + '.' + conditions);
       pendingCondition = true;
 
       return this;
@@ -281,50 +282,27 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-   * Group results
-   * - constraint : field must be type of String
-   * - constraint : field must exist in current schema
-   *
-  * @function group
-  *
-  * @param {String} field
-  * @return {Object} selectObject
-  * @throws {paramTypeMismatch|fieldNotFound}
-  */
-  function group(field) {
-    if(typeof field !== "string")
-    throw new Error(localErrors.paramTypeMismatch);
-
-    if(typeof schema[field] === "undefined")
-    throw new Error(localErrors.fieldNotFound);
-
-    tmpGroupBy = field;
-
-    return this;
-  }
-
-  /**
    * Sort results
    * - constraint : fields must be type of Object
    *
-  * @function sort
-  *
-  * @param {Object} fields { fieldName: 'ASC', fieldName: 'DESC' }
-  * @return {Object} selectObject
-  * @throws {paramTypeMismatch}
-  */
+   * @function sort
+   *
+   * @param {Object} fields { fieldName: 'ASC', fieldName: 'DESC' }
+   * @return {Object} selectObject
+   * @throws {paramTypeMismatch}
+   */
   function sort(fields) {
     if(typeof fields === "undefined")
-    throw new Error(localErrors.paramTypeMismatch);
+      throw new Error(localErrors.paramTypeMismatch);
 
     // Sanitize object : turn -1 and 1 to DESC and ASC
     for(let f in fields) {
       switch(fields[f]) {
         case -1 :
-        fields[f] = 'DESC';
+          fields[f] = 'DESC';
         break;
         case 1 :
-        fields[f] = 'ASC';
+          fields[f] = 'ASC';
         break;
       }
     }
@@ -337,37 +315,19 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-   * Limit results
-   * - constraint : val must be type of Number
-   *
-   * @function limit
-   *
-   * @param {Number} val
-   * @return {Object} selectObject
-   * @throws {paramTypeMismatch}
-   */
-  function limit(val) {
-    if(typeof val !== "number")
-    throw new Error(localErrors.paramTypeMismatch);
-
-    tmpLimit = val;
-
-    return this;
-  }
-
-  /**
    * Offset results
    * - constraint : val must be type of Number
    * 
    * @function skip
    *
-   * @param {Number} val
+   *
+   * @param {Number} val Value
    * @return {Object} selectObject
    * @throws {paramTypeMismatch}
    */
   function skip(val) {
     if(typeof val !== "number")
-    throw new Error(localErrors.paramTypeMismatch);
+      throw new Error(localErrors.paramTypeMismatch);
 
     tmpOffset = val;
 
@@ -377,21 +337,21 @@ module.exports = (table, schemaObject, options) => {
   /**
    * Populate a foreign key
    * - constraint : field must be type of Id
-   *
+   * 
    * @function populate
    *
-   * @param {String} field
+   * @param {String} field Path to populate
    * @return {Object} selectObject
    * @throws {fieldNotForeignKey}
    */
   function populate(field) {
     if (typeof populated[field] !== "undefined")
-    return;
+      return;
 
     let fk = schema[field];
 
     if (fk.type !== Types.Id)
-    throw new Error(localErrors.fieldNotForeignKey);
+      throw new Error(localErrors.fieldNotForeignKey);
 
     let foreignTable = fk.ref.toLowerCase();
 
@@ -410,33 +370,33 @@ module.exports = (table, schemaObject, options) => {
   }
 
   /**
-  * Execute the query, if there are hooks, execute them too.
-  *
-  * @function exec
-  *
-  * @return {Promise} Bluebird Promise
-  */
+   * Execute the query, if there are hooks, execute them too.
+   *
+   * @function skip
+   *
+   * @return {Promise} Bluebird Promise
+   */
   function exec() {
     // Forge query
     tmpQuery += " FROM " + table.toLowerCase();
     
     if(tmpLeftJoin !== null)
-    tmpQuery += tmpLeftJoin + " ";
+      tmpQuery += tmpLeftJoin + " ";
+
 
     if (tmpConditions !== "")
       tmpQuery += " WHERE " + tmpConditions;
 
     if(tmpGroupBy !== "")
-    tmpQuery += " GROUP BY " + tmpGroupBy;
+      tmpQuery += " GROUP BY " + tmpGroupBy;
 
     if(tmpOrder !== "")
-    tmpQuery += " ORDER " + tmpOrder;
+      tmpQuery += " ORDER " + tmpOrder;
 
-    if(tmpLimit !== null)
-    tmpQuery += " LIMIT " + tmpLimit;
+    tmpQuery += " LIMIT 1";
 
     if(tmpOffset !== null)
-    tmpQuery += " OFFSET " + tmpOffset;
+      tmpQuery += " OFFSET " + tmpOffset;
 
     return new Promise((resolve, reject) => {
 
@@ -449,26 +409,25 @@ module.exports = (table, schemaObject, options) => {
       })
       .then(() => {
         const query = new Query();
+        query.run(tmpQuery)
+          .then(response => {
+            let item = null;
 
-        return query.run(tmpQuery)
-        .then(response => {
-          let items = response.results.rows.length > 0 ? [] : null;
-          let itemModel = GetModel(table);
+            if(response.results.rows.length === 1) {
+              let itemModel = GetModel(table);
+              item = new itemModel(response.results.rows[0]);
+            }
 
-          // Turn response objects into models
-          response.results.rows.map(r => {
-            items.push(new itemModel(r));
+            if (!!postCallback) {
+              postCallback = postCallback.bind(item);
+              postCallback(item);
+            }
+
+            return resolve(item);
+          })
+          .catch(err => {
+            return reject(err);
           });
-
-          if (!!postCallback) {
-            postCallback(items);
-          }
-
-          return resolve(items);
-        })
-        .catch(err => {
-          return reject(err);
-        });
       })
 
     });
@@ -479,19 +438,13 @@ module.exports = (table, schemaObject, options) => {
   if(!!options.where)
     where(options.where);
 
-  if(!!options.group)
-    group(options.group);
-
   if(!!options.order)
     sort(options.order);
-
-  if(!!options.limit)
-    limit(options.limit);
 
   if(!!options.offset)
     skip(options.offset);
 
-  const selectObject = {
+  const selectOneObject = {
     sort,
     order: sort, // Alias
     where,
@@ -501,8 +454,6 @@ module.exports = (table, schemaObject, options) => {
     notbetween,
     gt: greater,
     lt: lighter,
-    group,
-    limit,
     skip,
     offset: skip, // Alias
     populate,
@@ -516,5 +467,5 @@ module.exports = (table, schemaObject, options) => {
     }
   };
 
-  return selectObject;
+  return selectOneObject;
 };
