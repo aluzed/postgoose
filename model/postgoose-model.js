@@ -3,8 +3,8 @@
 *
 * @description Postgresql Model Class
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const path         = require('path');
 const Promise      = require('bluebird');
@@ -27,6 +27,8 @@ const ModelCollection = require(path.join(__dirname, 'model-collection'));
  * - ModelNotPersisted : model has not been persisted yet, so id column is missing.
  * - ModelAlreadyPersisted : model has already been persisted.
  * - ForbiddenColumnName : a column name is forbidden in schema definition.
+ * - SchemaPathsHasChanged : schema paths has changed please delete the table to refresh it or use old schema
+ * - BadCallbackFormat : bad callback format
  */
 const localErrors = {
   ModelNotPersisted     : 'Error, model has not been persisted yet',
@@ -48,6 +50,8 @@ const forbiddenColumns = [
  * Create an Array of conditions from an object { key: value }
  *
  * @function _mapCriterias
+ * @ignore
+ * 
  * @private
  *
  * @param {Object} object
@@ -125,6 +129,8 @@ function _mapCriterias(object) {
  * Handles arguments and turn them into an object
  *
  * @function _sanitizeArguments
+ * @ignore
+ * 
  * @private
  *
  * @param {Spread} args
@@ -239,7 +245,14 @@ module.exports = (table, schema) => {
       }
     }
 
-    // Set deep object values
+    /**
+     * Set deep object values
+     * 
+     * @function _setValues
+     * @ignore
+     * 
+     * @param {Object} values key/value
+     */ 
     _setValues(values) {
       for (let field in values) {
         this[field] = values[field];
@@ -421,7 +434,7 @@ module.exports = (table, schema) => {
                 });
             });
             
-            return item.update(newValues, cb);
+            // return item.update(newValues, cb);
           })
           .catch(err => {
             return !!cb ? cb(err) : reject(err);
@@ -473,12 +486,12 @@ module.exports = (table, schema) => {
 
     /**
      * Create Method
-     * - constraint this.id must be undefined
+     * - constraint : this.id must be undefined yet
      *
      * @method create
      *
      * @param {Object} item Values
-     * @param {Function} cb Callback
+     * @param {Function} cb (err, item) => { ... }
      * @return {Promise} Bluebird Promise
      * @throws {ModelAlreadyPersisted}
      */
@@ -501,9 +514,52 @@ module.exports = (table, schema) => {
     }
 
     /**
+     * Insert Many Method
+     * 
+     * @method insertMany
+     * 
+     * @param {Array} items Array of items
+     * @param {Function} cb (err, items) => { ... }
+     * @return {Promise} Bluebird Promise
+     * @throws {ModelAlreadyPersisted} 
+     */
+    static insertMany(items, cb) {
+      const Self = this;
+
+      return new Promise((resolve, reject) => {
+        let results = [];
+
+        return Promise.each(items, item => {
+          return new Promise((res, rej) => {
+
+            let model = new this(item);
+
+            let inserManyObj = Insert(table, model);
+
+            inserManyObj._pre(schema.hooks.pre.insertMany);
+            inserManyObj._post(schema.hooks.post.insertMany);
+
+            inserManyObj.exec().then(row => {
+              results.push(row);
+              return res();
+            })
+
+          })
+        })
+        .then(() => {
+          return !!cb ? cb(null, results) : resolve(results);
+        })
+        .catch(err => {
+          return !!cb ? cb(err) : reject(err);
+        })
+      })
+    }
+
+    /**
      * RemoveAll Method
      * 
      * @method removeAll
+     * @static
      * 
      * @param {Object} criteria Expected values
      * @param {Function} cb (err, item) => { ... }
@@ -511,25 +567,28 @@ module.exports = (table, schema) => {
      * @throws {Error}
      */
     static removeAll(criteria, cb) {
-      const conditions = _mapCriterias(criteria);
-
-      let removeAllObject = RemoveAll(table, {
-        where: conditions,
-        fields: params.fields,
-        order: params.order
-      });
-
-      selectObject._pre(schema.hooks.pre.find);
-      selectObject._post(schema.hooks.post.find);
+      const Self = this;
 
       return new Promise((resolve, reject) => {
-        return selectObject.exec().then(rows => {
-          return (!!cb) ? cb(null, rows) : resolve(rows);
-        })
-          .catch(err => {
-            return (!!cb) ? cb(err) : reject(err);
-          });
+        Self
+          .find(criteria).then(items => {
+            if (!items)
+              return !!cb ? cb(null, []) : resolve([]);
+
+            return Promise.each(items, item => {
+              let removeAllObject = Remove(table, item);
+
+              removeAllObject._pre(schema.hooks.pre.removeAll);
+              removeAllObject._post(schema.hooks.post.removeAll);
+
+              return removeAllObject.exec();
+            }).then(() => {
+              return !!cb ? cb(null, items) : resolve(items);
+            });
+          })
+          .catch(err => reject(err));
       })
+
     }
 
     /**
@@ -610,7 +669,7 @@ module.exports = (table, schema) => {
 
     /**
      * Remove method
-     * - constraint this.id must exist
+     * - constraint : this.id must exist
      *
      * @method remove
      *
@@ -642,7 +701,7 @@ module.exports = (table, schema) => {
 
     /**
      * Update Method
-     * - constraint this.id must exist
+     * - constraint : this.id must exist
      *
      * @method update
      *

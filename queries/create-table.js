@@ -1,10 +1,11 @@
 /**
 * @module Queries/CreateTable
+* @ignore
 *
 * @description Create a table in our Postgresql database
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const path    = require('path');
 const Query   = require('./query');

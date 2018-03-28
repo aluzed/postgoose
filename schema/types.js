@@ -2,7 +2,20 @@
  * @module Core/PostgooseSchema/Types
  * 
  * @description List of all available types
+ * - id
+ * - mixed
+ * - uuid
+ * - string
+ * - text
+ * - boolean
+ * - number
+ * - bignumber
+ * - date
+ * - json
+ * - jsonb
  * 
+ * @copyright 2018
+ * @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
  */
 const path = require('path');
 /**

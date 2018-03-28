@@ -1,5 +1,5 @@
 Arguments: 
-  /home/aluzed/.nvm/versions/node/v9.2.0/bin/node /home/aluzed/.nvm/versions/node/v9.2.0/bin/yarn doc
+  /home/aluzed/.nvm/versions/node/v9.2.0/bin/node /home/aluzed/.nvm/versions/node/v9.2.0/bin/yarn test
 
 PATH: 
   /home/aluzed/.nvm/versions/node/v9.2.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
@@ -694,9 +694,9 @@ Lockfile:
 
 Trace: 
   Error: Command failed.
-  Exit code: 1
+  Exit code: 2
   Command: sh
-  Arguments: -c rm -rf ./docs && jsdoc -t ./node_modules/ink-docstrap/template -r ./readme.md -c ./jsdoc.json -d docs .
+  Arguments: -c node ./node_modules/mocha/bin/_mocha ./tests/index.js --exit
   Directory: /var/www/node/postgoose
   Output:
   

@@ -1,7 +1,10 @@
 /**
- * @module Core/PostgooseSchema
+ * @module Core/PostgooseSchema/HooksList
  * 
- * @description list of all hooks
+ * @description List of all hooks
+ * 
+ * @copyright 2018
+ * @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
  */
 
 /**
@@ -9,14 +12,16 @@
 * - create
 * - save
 * - update
+* - updateAll
 * - remove
+* - removeAll
 * - find
 * - findByIdAndUpdate
 * - findByIdAndRemove
 * - findById
 * - findOne
 */
-module.exports = [
+const allowedHooks = [
   'create',
   'save',
   'update',
@@ -27,3 +32,5 @@ module.exports = [
   'findById',
   'findOne' 
 ];
+
+module.exports = allowedHooks;

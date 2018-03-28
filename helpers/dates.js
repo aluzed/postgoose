@@ -1,10 +1,11 @@
 /**
 * @module Helpers/DateHelpers
-* 
+* @ignore 
+*
 * @description Set of tools to convert Date from JS > DB and DB > JS
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 
 /**

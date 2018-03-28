@@ -3,8 +3,8 @@
 *
 * @description Remove data from our Postgresql database
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const Query = require('./query');
 const Promise = require('bluebird');

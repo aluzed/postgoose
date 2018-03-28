@@ -1,10 +1,11 @@
 /**
 * @module Queries/CheckColumns
+* @ignore
 *
 * @description Check each columns and look if schema has changed
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const path  = require('path');
 const Query = require('./query');

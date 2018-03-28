@@ -1,9 +1,10 @@
 /**
  * @module Postgoose
- * @resource Postgoose Object
- *
- * PostGoose Export Object
- *
+ *  
+ * @description Postgoose Object
+ * 
+ * @copyright 2018
+ * @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
  */
 const { Schema }     = require('./schema');
 const Query          = require('./queries/query');
@@ -16,6 +17,7 @@ const {
   ModelErrors }      = require('./model/model-collection');
 const PostgooseModel = require('./model/postgoose-model');
 let _dbConfig        = null;
+const Promise        = require('bluebird');
 
 const PostGoose = {
   /**
@@ -23,16 +25,30 @@ const PostGoose = {
    *
    * @function connect
    *
-   * @param {Object} dbConfig : { host: "...", user: "...", password: "..." }
+   * @param {Object} dbConfig { host: "...", user: "...", password: "..." }
+   * @example
+   *
+   * const postgoose = require('postgoose');
+   * postgoose.connect({
+   *   "host"     : "localhost",
+   *   "port"     : 5432,
+   *   "database" : "database_name",
+   *   "user"     : "johndoe",
+   *   "password" : "qwerty"
+   * }, () => {
+   *  console.log('connected !');
+   * })
+   * 
    */
   connect: (dbConfig, callback) => {
     _dbConfig = dbConfig;
 
-    // If there is no connection
-    if(!!callback)
-      return Connection.connect(dbConfig).then(() => callback());
-    else 
-      return Connection.connect(dbConfig);
+    Connection
+        .connect(dbConfig)
+        .then(() => {
+          if(!!callback)
+            callback();
+        });
   },
   /**
    * Set or Get a model, like in mongoose
@@ -42,6 +58,14 @@ const PostGoose = {
    * @param {String} name Table name
    * @param {Object} schema Schema object (Optionnal)
    * @return {Model}
+   * @example 
+   * 
+   * // Set model
+   * postgoose.model('modelName', modelSchema);
+   * 
+   * // Get model
+   * const myModel = postgoose.modelt('modelName');
+   * myModel.find()...
    */
   model: (name, schema) => {
     // If no schema specified get from models
@@ -66,25 +90,51 @@ const PostGoose = {
    * @param {Object} dbConfig Database config
    * @param {String} queryStr Query string
    * @param {Function} callback (err, results) => {...}
-   * @return {Promise}
+   * @return {Promise} Bluebird Promise
    * @throws {ConnectionNotInitialized}
+   * 
+   * @example 
+   * 
+   * postgoose.runOnce({
+   *   "host"     : "localhost",
+   *   "port"     : 5432,
+   *   "database" : "database_name",
+   *   "user"     : "johndoe",
+   *   "password" : "qwerty"
+   * }, "SELECT id, username, email FROM users WHERE active = t", (err, results) => {
+   *    if(err)
+   *      console.trace(err);
+   * 
+   *    console.log(results);
+   * })
+   * 
+   * // Or with promises
+   * postgoose..runOnce({
+   *   "host"     : "localhost",
+   *   "port"     : 5432,
+   *   "database" : "database_name",
+   *   "user"     : "johndoe",
+   *   "password" : "qwerty"
+   * }, "SELECT * FROM table").then(results => {
+   *    console.log(results);
+   * })
    */
   runOnce: (dbConfig, queryStr, callback) => {
-    if (!PostGoose._dbConfig) throw new Error(ConnectionErrors.ConnectionNotInitialized);
-
-    let query = new Query();
-
-    return new Promise((resolve, reject) => {
-      query.run(queryStr)
-        .then((res) => {
-          currentConnection.end();
-          return !!callback ? callback(null, res) : resolve(res);
-        })
-        .catch(err => {
-          currentConnection.end();
-          return !!callback ? callback(err) : reject(err);
-        });
-    })
+    return PostGoose.connect(dbConfig).then(() => {
+      let query = new Query();
+  
+      return new Promise((resolve, reject) => {
+        query.run(queryStr)
+          .then((res) => {
+            currentConnection.end();
+            return !!callback ? callback(null, res) : resolve(res);
+          })
+          .catch(err => {
+            currentConnection.end();
+            return !!callback ? callback(err) : reject(err);
+          });
+      })
+    });
   },
   /**
    * Execute a query
@@ -93,8 +143,24 @@ const PostGoose = {
    *
    * @param {String} queryStr Query string
    * @param {Function} callback (err, results) => {...}
-   * @return {Promise}
+   * @return {Promise} Bluebird Promise
    * @throws {ConnectionNotInitialized}
+   * 
+   * @example 
+   * 
+   * // Once postgoose is connected
+   * postgoose.run("SELECT * FROM files", (err, results) => {
+   *    if(err)
+   *      console.trace(err);
+   * 
+   *    console.log(results);
+   * })
+   * 
+   * // Or with promises
+   * postgoose.run("SELECT * FROM table").then(results => {
+   *    console.log(results);
+   * })
+   * 
    */
   run: (queryStr, callback) => {
     if (!_dbConfig) throw new Error(ConnectionErrors.ConnectionNotInitialized);

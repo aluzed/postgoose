@@ -3,8 +3,8 @@
 *
 * @description Select data in our postgres database
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018 
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const path         = require('path');
 const Query        = require('./query');
@@ -85,8 +85,8 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Greater than
-   * - constraint pendingCondition
-   * - constraint val must be type of array
+   * - constraint : pendingCondition
+   * - constraint : val must be type of array
    *
   * @function gt
   *
@@ -109,8 +109,8 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Lighter than
-   * - constraint pendingCondition
-   * - constraint val must be type of Number
+   * - constraint : pendingCondition
+   * - constraint : val must be type of Number
    *
   * @function lt
   *
@@ -133,8 +133,8 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * If the field has one of these values
-   * - constraint pendingCondition
-   * - constraint array must be type of Array
+   * - constraint : pendingCondition
+   * - constraint : array must be type of Array
    *
   * @function in
   *
@@ -172,8 +172,8 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * If the field has this value
-   * - constraint pendingCondition
-   * - constraint val must be type of String or Number
+   * - constraint : pendingCondition
+   * - constraint : val must be type of String or Number
    *
    * @function equals
    *
@@ -196,9 +196,9 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Get results between a and b for a given field
-   * - constraint pendingCondition
-   * - constraint a must be type of Number
-   * - constraint b must be type of Number
+   * - constraint : pendingCondition
+   * - constraint : a must be type of Number
+   * - constraint : b must be type of Number
    *
    * @function between
    *
@@ -222,9 +222,9 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Get results not between a and b for a given field
-   * - constraint pendingCondition
-   * - constraint a must be type of Number
-   * - constraint b must be type of Number
+   * - constraint : pendingCondition
+   * - constraint : a must be type of Number
+   * - constraint : b must be type of Number
    *
    * @function notbetween
    *
@@ -248,7 +248,7 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Start a new conditions or a group of conditions
-   * - constraint must be type of Array or String
+   * - constraint : must be type of Array or String
    *
    * @function where
    *
@@ -282,8 +282,8 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Group results
-   * - constraint field must be type of String
-   * - constraint field must exist in current schema
+   * - constraint : field must be type of String
+   * - constraint : field must exist in current schema
    *
   * @function group
   *
@@ -305,7 +305,7 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Sort results
-   * - constraint fields must be type of Object
+   * - constraint : fields must be type of Object
    *
   * @function sort
   *
@@ -338,7 +338,7 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Limit results
-   * - constraint val must be type of Number
+   * - constraint : val must be type of Number
    *
    * @function limit
    *
@@ -357,7 +357,7 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Offset results
-   * - constraint val must be type of Number
+   * - constraint : val must be type of Number
    * 
    * @function skip
    *
@@ -376,7 +376,7 @@ module.exports = (table, schemaObject, options) => {
 
   /**
    * Populate a foreign key
-   * - constraint field must be type of Id
+   * - constraint : field must be type of Id
    *
    * @function populate
    *

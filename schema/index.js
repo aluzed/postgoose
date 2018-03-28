@@ -3,8 +3,8 @@
 *
 * @description Schema class and definition
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const SchemaPath = require('./schema-path');
 const _Types     = require('./types');
@@ -15,17 +15,19 @@ const _HooksList = require('./hooks-list');
 *
 * - UndefinedType : The type does not exist in PostgooseSchema.Types
 * - UnknownHookType : The hook type does not exist in allowed hooksList
+* - BadTypeFormat : schema type must be type of ...
 */
 const localErrors = {
   UndefinedType   : 'Error, undefined type',
   UnknownHookType : 'Error, unknown hook type',
-  BadTypeFormat   : 'Error, schema type must be type of function'
+  BadTypeFormat   : 'Error, bad schema type'
 };
 
 /**
- * Convert a field to a path
+ * Convert a field to a schema path (like in mongoose :-P)
  *
  * @function fieldToPath
+ * @ignore
  *
  * @param {Object} field
  * @return {Object} path
@@ -96,7 +98,7 @@ function fieldToPath(name, field) {
 const PostgooseSchema = class {
   /**
    * Schema Constructor
-   * - constraint each field type must exist in Postgoose.SChema.Types
+   * - constraint : each field type must exist in Postgoose.Schema.Types
    *
    * @constructor PostgooseSchema
    *
@@ -126,7 +128,7 @@ const PostgooseSchema = class {
 
   /**
    * Bind a pre hook to our schema
-   * - constraint hookType must be an allowed hook
+   * - constraint : hookType must be an allowed hook
    *
    * @function pre
    *
@@ -144,7 +146,7 @@ const PostgooseSchema = class {
 
   /**
    * Bind a post hook to our schema
-   * - constraint hookType must be an allowed hook
+   * - constraint : hookType must be an allowed hook
    *
    * @function post
    *

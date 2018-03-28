@@ -36,5 +36,12 @@ postgoose.connect(conf, () => {
 })
 ```
 
+### Copyright
+
+LICENCE MIT 
+
+Copyright(c) 2018 Alexandre PENOMBRE
+<aluzed_AT_gmail.com>
+
 
 

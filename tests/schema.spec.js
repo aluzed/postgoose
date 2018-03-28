@@ -224,8 +224,36 @@ describe('Tests Schema', () => {
     })
   });
 
+  it('# schema.insertMany', done => {
+    People.insertMany([
+      {
+        name: 'Titi',
+        age: 61
+      },
+      {
+        name: 'Tata',
+        age: 62
+      },
+      {
+        name: 'Toto',
+        age: 63
+      }
+    ], (err, results) => {
+      expect(err).to.be.null;
+      expect(results).to.have.property('length').to.equal(3);
+      done();
+    })
+  })
+
   it('# schema.removeAll', done => {
-    done(new Error())
+    People.removeAll({ 'name ilike': '%doe%' }, (err, removedItems) => {
+      expect(removedItems).to.have.property('length').to.equal(2);
+
+      People.find().then(people => {
+        expect(people).to.have.property('length').to.equal(3);
+        done();
+      });
+    });
   });
 
 });

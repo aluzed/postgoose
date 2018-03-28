@@ -3,8 +3,8 @@
 *
 * @description Remove data from our Postgresql database
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 const Query = require('./query');
 const Promise = require('bluebird');
@@ -27,8 +27,8 @@ module.exports = (table, model) => {
 
   /**
    * If the field has one of these values
-   * - constraint pendingCondition
-   * - constraint array must be type of Array
+   * - constraint : pendingCondition
+   * - constraint : array must be type of Array
    * 
    * @function in
    *
@@ -67,7 +67,7 @@ module.exports = (table, model) => {
 
   /**
    * Start a new conditions or a group of conditions
-   * - constraint must be type of Array or String
+   * - constraint : must be type of Array or String
    *
    * @function where
    *

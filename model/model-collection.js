@@ -1,10 +1,11 @@
 /**
-* @module Core/Model
+* @module Core/ModelCollections
+* @ignore 
 *
 * @description Model Wrapper
 *
-* Copyright(c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 let __models = {};
 
@@ -38,8 +39,8 @@ module.exports = {
    *
    * @function GetModel
    *
-   * @param {String} table
-   * @return {Object} model
+   * @param {String} table Table name
+   * @return {Object} Model
    */
    GetModel: (table) => {
     if(typeof table === "undefined")
@@ -55,7 +56,7 @@ module.exports = {
    *
    * @function GetModels
    *
-   * @return {Object} collection of models
+   * @return {Object} Collection of models
    */
    GetModels: () => Object.assign({}, __models),
   /**

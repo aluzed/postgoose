@@ -3,8 +3,8 @@
 *
 * @description Query runner library
 *
-* Copyright (c) 2018 Alexandre PENOMBRE
-* <aluzed_AT_gmail.com>
+* @copyright 2018
+* @author Alexandre PENOMBRE <aluzed_AT_gmail.com>
 */
 "use strict";
 const Promise        = require('bluebird');
