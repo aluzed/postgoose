@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node ./node_modules/mocha/bin/_mocha ./tests/index.js --exit",
-    "dev:stats": "find . -name '*.js' -not -path './node_modules/*' -not -path './public/*' | xargs wc -l",
+    "dev:stats": "find . -name '*.js' -not -path './node_modules/*' -not -path './public/*' -not -path './docs/*' | xargs wc -l",
     "doc": "rm -rf ./docs && jsdoc -t ./node_modules/ink-docstrap/template -r ./readme.md -c ./jsdoc.json -d docs .",
     "doc-server": "http-server ./docs"
   },
