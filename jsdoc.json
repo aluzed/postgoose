@@ -15,10 +15,33 @@
       "closure"
     ]
   },
+  "opts": {
+    "template": "node_modules/tui-jsdoc-template"
+  },
+  "how_to_use": {
+    "title": "How to use"
+  },
+  "insert": {
+    "title": "Insert"
+  },
   "templates": {
-    "cleverLinks": false,
-    "monospaceLinks": false,
-    "systemName": "Postgoose",
-    "theme": "readable"
+    "name": "Rest List",
+    "default": {
+      "staticFiles": {
+        "include": [
+          "documentation/"
+        ]
+      }
+    },
+    "css": [
+      "style/documentation.css"
+    ],
+    "logo": {
+      "url": "https://raw.githubusercontent.com/aluzed/express-mongoose-rest-list/dev/logo/logo.png",
+      "width": "119px",
+      "height": "46px",
+      "link": "https://github.com/aluzed/postgoose"
+    },
+    "footerText": "Postgoose - Copyright &copy; 2018"
   }
 }
