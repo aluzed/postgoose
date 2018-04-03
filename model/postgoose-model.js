@@ -11,7 +11,6 @@ const Promise      = require('bluebird');
 const Insert       = require(path.join(__dirname, '..', 'queries', 'insert'));
 const Update       = require(path.join(__dirname, '..', 'queries', 'update'));
 const Remove       = require(path.join(__dirname, '..', 'queries', 'remove'));
-const RemoveAll    = require(path.join(__dirname, '..', 'queries', 'remove-all'));
 const Select       = require(path.join(__dirname, '..', 'queries', 'select'));
 const SelectOne    = require(path.join(__dirname, '..', 'queries', 'select-one'));
 const Query        = require(path.join(__dirname, '..', 'queries', 'query'));

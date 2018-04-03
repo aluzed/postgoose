@@ -31,7 +31,7 @@ describe('Tests Schema', () => {
     ).then(() => {
       done();
     });
-  });
+  }).timeout(5 * 1000);
 
   it('# schema.create People', done => {
     const tmpPerson1 = {
