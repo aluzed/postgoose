@@ -1,0 +1,17 @@
+.main {
+  margin-bottom: 42px;
+}
+
+#resizer, footer {
+  background-color: #336791;
+}
+
+footer {
+  height: 42px;
+}
+
+footer .footer-text {
+  position: absolute;    
+  top: 12px;
+}
+

@@ -25,7 +25,7 @@
     "title": "Insert"
   },
   "templates": {
-    "name": "Rest List",
+    "name": "Postgoose",
     "default": {
       "staticFiles": {
         "include": [
@@ -34,12 +34,12 @@
       }
     },
     "css": [
-      "style/documentation.css"
+      "style/doc.css"
     ],
     "logo": {
-      "url": "https://raw.githubusercontent.com/aluzed/express-mongoose-rest-list/dev/logo/logo.png",
-      "width": "119px",
-      "height": "46px",
+      "url": "https://raw.githubusercontent.com/aluzed/postgoose/dev/documentation/logo/postgoose.png",
+      "width": "150px",
+      "height": "35px",
       "link": "https://github.com/aluzed/postgoose"
     },
     "footerText": "Postgoose - Copyright &copy; 2018"
