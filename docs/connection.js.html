@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Home | Rest List</title>
+    <title>Source: connection.js | Rest List</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -48,24 +50,79 @@
 
 
     
-
-
-
-
-
-
-
-
-
-    
-
-
     <section>
-        <article class="readme"><h2>Postgoose</h2><p>Mongoose-like postgresql library.</p>
-<h3>How To Use</h3><p><a href="tutorial-how_to_use.html">how_to_use</a></p></article>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { Client } = require('pg');
+const Promise = require('bluebird');
+let currentConnection = null;
+let dbConf = null;
+
+const localErrors = {
+  ConnectionNotInitialized: 'Error, connection must be initialized'
+}
+
+module.exports = {
+  Connection: {
+    /**
+     * Return if the connection is set or not
+     *
+    * @function isConnected
+    *
+    * @return {Boolean}
+    */
+    isConnected: () => currentConnection !== null,
+    /**
+     * Copy the connection informations and connect to Postgresql database
+     *
+     * @function connect
+     *
+     * @param {Object} dbConfig : { host: "...", user: "...", password: "..." }
+     */
+    connect: (dbConfig) => {
+      return new Promise((resolve, reject) => {
+        if (!currentConnection) {
+          currentConnection = new Client(dbConfig);
+          dbConf = dbConfig;
+          currentConnection.connect();
+          return resolve();
+        }
+      });
+    },
+    /**
+     * Disconnect the socket
+     *
+     * @function disconnect
+     *
+     * @throws {ConnectionNotInitialized}
+     */
+    disconnect: () => {
+      if (!currentConnection) throw new Error(localErrors.ConnectionNotInitialized);
+
+      currentConnection.end();
+      currentConnection = null;
+    },
+    /**
+     * Get the current DB Config
+     *
+     * @function getConfig
+     *
+     * @return {Object}
+     */
+    getConfig: () => dbConf,
+    /**
+     * Return the current connection object
+     *
+     * @function getConnection
+     *
+     * @return {Object}
+     */
+    getConnection: () => currentConnection
+  },
+  ConnectionErrors: localErrors
+}
+</code></pre>
+        </article>
     </section>
-
-
 
 
 
@@ -82,7 +139,7 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'package:undefined_sub'.replace(/"/g, '_');
+        var id = '_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

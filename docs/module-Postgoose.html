@@ -1,108 +1,106 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
-	<title>Postgoose Module: Postgoose</title>
+    <meta charset="utf-8">
+    <title>Module: Postgoose | Rest List</title>
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
 
-	<link type="text/css" rel="stylesheet" href="styles/site.readable.css">
-
+    
+        
+            <link type="text/css" rel="stylesheet" href="style/documentation.css">
+        
+    
 </head>
-
 <body>
-
-<div class="navbar navbar-default navbar-fixed-top ">
-<div class="container">
-	<div class="navbar-header">
-		<a class="navbar-brand" href="index.html">Postgoose</a>
-		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-        </button>
-	</div>
-	<div class="navbar-collapse collapse" id="topNavigation">
-		<ul class="nav navbar-nav">
-			
-			<li class="dropdown">
-				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="module-Core_Model.html">Core/Model</a></li><li><a href="module-Core_PostgooseSchema.html">Core/PostgooseSchema</a></li><li><a href="module-Core_PostgooseSchema_HooksList.html">Core/PostgooseSchema/HooksList</a></li><li><a href="module-Core_PostgooseSchema_Types.html">Core/PostgooseSchema/Types</a></li><li><a href="module-Postgoose.html">Postgoose</a></li><li><a href="module-Queries_Insert.html">Queries/Insert</a></li><li><a href="module-Queries_Query.html">Queries/Query</a></li><li><a href="module-Queries_Remove.html">Queries/Remove</a></li><li><a href="module-Queries_Select.html">Queries/Select</a></li><li><a href="module-Queries_SelectOne.html">Queries/SelectOne</a></li><li><a href="module-Queries_TableExists.html">Queries/TableExists</a></li><li><a href="module-Queries_Update.html">Queries/Update</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="module-Core_Model-PostgooseModel.html">Core/Model~PostgooseModel</a></li><li><a href="module-Core_PostgooseSchema-PostgooseSchema.html">Core/PostgooseSchema~PostgooseSchema</a></li><li><a href="module-Queries_Query-Query.html">Queries/Query~Query</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#connect">connect</a></li><li><a href="global.html#disconnect">disconnect</a></li><li><a href="global.html#getConfig">getConfig</a></li><li><a href="global.html#getConnection">getConnection</a></li><li><a href="global.html#isConnected">isConnected</a></li>
-				</ul>
-			</li>
-			
-		</ul>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="width: 119px; height: 46px">
         
-            <div class="col-sm-3 col-md-3">
-                <form class="navbar-form" role="search">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+            <a href="https://github.com/aluzed/postgoose" rel="noopener noreferrer" target="_blank">
+                <img src="https://raw.githubusercontent.com/aluzed/express-mongoose-rest-list/dev/logo/logo.png" width="100%" height="100%">
+            </a>
         
-	</div>
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">Rest List</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-examples hidden"><h3>Examples</h3><ul><li><a href="tutorial-how_to_use.html">how_to_use</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="how_to_use_sub"></div></li><li><a href="tutorial-insert.html">insert</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="insert_sub"></div></li></ul></div><div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-Postgoose.html">Postgoose</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:Postgoose_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-Postgoose.html#~connect">connect</a></li><li><a href="module-Postgoose.html#~model">model</a></li><li><a href="module-Postgoose.html#~run">run</a></li><li><a href="module-Postgoose.html#~runOnce">runOnce</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Global</h3><ul><li><a href="global.html#connect">connect</a></li><li><a href="global.html#disconnect">disconnect</a></li><li><a href="global.html#getConfig">getConfig</a></li><li><a href="global.html#getConnection">getConnection</a></li><li><a href="global.html#isConnected">isConnected</a></li></ul></div>
+</nav>
+<div id="resizer"></div>
 
-</div>
-</div>
+<div class="main" id="main">
+    
 
 
-<div class="container" id="toc-content">
-<div class="row">
 
-	
-	<div class="col-md-8">
-	
-		<div id="main">
-			
 
-	<h1 class="page-title">Module: Postgoose</h1>
 <section>
 
 <header>
     
+        <h2>Postgoose</h2>
+        
+            
+        
+    
 </header>
 
-
 <article>
-    <div class="container-overview">
     
+        <div class="container-overview">
         
-            <div class="description"><p>Postgoose Object</p></div>
-        
+            
+                <div class="description"><p>Postgoose Object</p></div>
+            
 
-        
+            
+                
+
+<dt>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
 
@@ -112,45 +110,50 @@
 
     
 
-	
+    
 
-	
-	<dt class="tag-author method-doc-label method-doc-details-label">Author:</dt>
-	<dd class="tag-author">
-		<ul>
-			<li>Alexandre PENOMBRE &lt;aluzed_AT_gmail.com></li>
-			</ul>
-	</dd>
-	
+    
 
-	
-	<dt class="tag-copyright method-doc-label method-doc-details-label">Copyright:</dt>
-	<dd class="tag-copyright">
-		<ul class="dummy">
-			<li>2018</li>
-		</ul>
-	</dd>
-	
+    
 
-	
+    
 
-	
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Alexandre PENOMBRE &lt;aluzed_AT_gmail.com></li>
+        </ul>
+    </dd>
+    
 
+    
+    <dt class="tag-copyright">Copyright:</dt>
+    <dd class="tag-copyright"><ul class="dummy"><li>2018</li></ul></dd>
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 </dl>
 
 
-        
     
-    </div>
+
+</dd>
+
+            
+        
+        </div>
+    
+
+    
 
     
 
@@ -168,11 +171,23 @@
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
-            
-<hr>
+                
+
 <dt>
-    <h4 class="name" id="~connect"><span class="type-signature">&lt;inner> </span>connect(dbConfig)</h4>
     
+        <h4 class="name" id="~connect">
+            
+                <span class="type-signature"><span class="icon green">inner</span> </span>connect<span class="signature">(dbConfig)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="index.js.html">index.js</a></code>,
+                <code><a href="index.js.html#line23">line 23</a></code>
+            </div>
+            
+        </h4>
+
+        
     
 </dt>
 <dd>
@@ -188,11 +203,12 @@
     
 
     
+
     
+    <div class="container-params">
         <h5>Parameters:</h5>
         
-
-<table class="params table table-striped">
+<table class="params">
     <thead>
     <tr>
         
@@ -223,7 +239,6 @@
 <span class="param-type">Object</span>
 
 
-
             
             </td>
 
@@ -238,17 +253,25 @@
     </tbody>
 </table>
 
+    </div>
     
 
     
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
 
@@ -258,64 +281,66 @@
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 </dl>
 
 
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">const postgoose = require(&#x27;postgoose&#x27;);
+    <pre class="prettyprint"><code>const postgoose = require('postgoose');
 postgoose.connect({
-  &quot;host&quot;     : &quot;localhost&quot;,
-  &quot;port&quot;     : 5432,
-  &quot;database&quot; : &quot;database_name&quot;,
-  &quot;user&quot;     : &quot;johndoe&quot;,
-  &quot;password&quot; : &quot;qwerty&quot;
-}, () =&gt; {
- console.log(&#x27;connected !&#x27;);
-})</pre>
-
+  "host"     : "localhost",
+  "port"     : 5432,
+  "database" : "database_name",
+  "user"     : "johndoe",
+  "password" : "qwerty"
+}, () => {
+ console.log('connected !');
+})</code></pre>
 
     
+
 </dd>
 
-        
             
-<hr>
+                
+
 <dt>
-    <h4 class="name" id="~model"><span class="type-signature">&lt;inner> </span>model(name, schema)</h4>
     
+        <h4 class="name" id="~model">
+            
+                <span class="type-signature"><span class="icon green">inner</span> </span>model<span class="signature">(name, schema)</span><span class="type-signature"> &rarr; {Model}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="index.js.html">index.js</a></code>,
+                <code><a href="index.js.html#line53">line 53</a></code>
+            </div>
+            
+        </h4>
+
+        
     
 </dt>
 <dd>
@@ -331,11 +356,12 @@ postgoose.connect({
     
 
     
+
     
+    <div class="container-params">
         <h5>Parameters:</h5>
         
-
-<table class="params table table-striped">
+<table class="params">
     <thead>
     <tr>
         
@@ -366,7 +392,6 @@ postgoose.connect({
 <span class="param-type">String</span>
 
 
-
             
             </td>
 
@@ -390,7 +415,6 @@ postgoose.connect({
 <span class="param-type">Object</span>
 
 
-
             
             </td>
 
@@ -405,47 +429,8 @@ postgoose.connect({
     </tbody>
 </table>
 
+    </div>
     
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
 
     
 
@@ -458,47 +443,95 @@ postgoose.connect({
     
 
     
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
+    <div class="container-returns">
+        <h5>Returns:</h5>
         
+                
+
+
+
 <span class="param-type">Model</span>
 
 
 
-    </dd>
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dl>
 
-
-        
 
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">// Set model
-postgoose.model(&#x27;modelName&#x27;, modelSchema);
+    <pre class="prettyprint"><code>// Set model
+postgoose.model('modelName', modelSchema);
 
 // Get model
-const myModel = postgoose.modelt(&#x27;modelName&#x27;);
-myModel.find()...</pre>
-
+const myModel = postgoose.modelt('modelName');
+myModel.find()...</code></pre>
 
     
+
 </dd>
 
-        
             
-<hr>
+                
+
 <dt>
-    <h4 class="name" id="~run"><span class="type-signature">&lt;inner> </span>run(queryStr, callback)</h4>
     
+        <h4 class="name" id="~run">
+            
+                <span class="type-signature"><span class="icon green">inner</span> </span>run<span class="signature">(queryStr, callback)</span><span class="type-signature"> &rarr; {Promise}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="index.js.html">index.js</a></code>,
+                <code><a href="index.js.html#line139">line 139</a></code>
+            </div>
+            
+        </h4>
+
+        
     
 </dt>
 <dd>
@@ -514,11 +547,12 @@ myModel.find()...</pre>
     
 
     
+
     
+    <div class="container-params">
         <h5>Parameters:</h5>
         
-
-<table class="params table table-striped">
+<table class="params">
     <thead>
     <tr>
         
@@ -549,7 +583,6 @@ myModel.find()...</pre>
 <span class="param-type">String</span>
 
 
-
             
             </td>
 
@@ -573,7 +606,6 @@ myModel.find()...</pre>
 <span class="param-type">function</span>
 
 
-
             
             </td>
 
@@ -588,47 +620,8 @@ myModel.find()...</pre>
     </tbody>
 </table>
 
+    </div>
     
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
 
     
 
@@ -649,7 +642,6 @@ myModel.find()...</pre>
 <span class="param-type">ConnectionNotInitialized</span>
 
 
-
     
     </div>
 
@@ -657,36 +649,70 @@ myModel.find()...</pre>
         
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>Bluebird Promise</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
+    <div class="container-returns">
+        <h5>Returns:</h5>
         
+                
+
+
+
 <span class="param-type">Promise</span>
 
 
 
-    </dd>
+
+
+- <p>Bluebird Promise</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dl>
 
-
-        
 
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">// Once postgoose is connected
-postgoose.run(&quot;SELECT * FROM files&quot;, (err, results) =&gt; {
+    <pre class="prettyprint"><code>// Once postgoose is connected
+postgoose.run("SELECT * FROM files", (err, results) => {
    if(err)
      console.trace(err);
 
@@ -694,20 +720,32 @@ postgoose.run(&quot;SELECT * FROM files&quot;, (err, results) =&gt; {
 })
 
 // Or with promises
-postgoose.run(&quot;SELECT * FROM table&quot;).then(results =&gt; {
+postgoose.run("SELECT * FROM table").then(results => {
    console.log(results);
-})</pre>
-
+})</code></pre>
 
     
+
 </dd>
 
-        
             
-<hr>
+                
+
 <dt>
-    <h4 class="name" id="~runOnce"><span class="type-signature">&lt;inner> </span>runOnce(dbConfig, queryStr, callback)</h4>
     
+        <h4 class="name" id="~runOnce">
+            
+                <span class="type-signature"><span class="icon green">inner</span> </span>runOnce<span class="signature">(dbConfig, queryStr, callback)</span><span class="type-signature"> &rarr; {Promise}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="index.js.html">index.js</a></code>,
+                <code><a href="index.js.html#line85">line 85</a></code>
+            </div>
+            
+        </h4>
+
+        
     
 </dt>
 <dd>
@@ -723,11 +761,12 @@ postgoose.run(&quot;SELECT * FROM table&quot;).then(results =&gt; {
     
 
     
+
     
+    <div class="container-params">
         <h5>Parameters:</h5>
         
-
-<table class="params table table-striped">
+<table class="params">
     <thead>
     <tr>
         
@@ -758,7 +797,6 @@ postgoose.run(&quot;SELECT * FROM table&quot;).then(results =&gt; {
 <span class="param-type">Object</span>
 
 
-
             
             </td>
 
@@ -780,7 +818,6 @@ postgoose.run(&quot;SELECT * FROM table&quot;).then(results =&gt; {
             
                 
 <span class="param-type">String</span>
-
 
 
             
@@ -806,7 +843,6 @@ postgoose.run(&quot;SELECT * FROM table&quot;).then(results =&gt; {
 <span class="param-type">function</span>
 
 
-
             
             </td>
 
@@ -821,47 +857,8 @@ postgoose.run(&quot;SELECT * FROM table&quot;).then(results =&gt; {
     </tbody>
 </table>
 
+    </div>
     
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
 
     
 
@@ -882,7 +879,6 @@ postgoose.run(&quot;SELECT * FROM table&quot;).then(results =&gt; {
 <span class="param-type">ConnectionNotInitialized</span>
 
 
-
     
     </div>
 
@@ -890,41 +886,75 @@ postgoose.run(&quot;SELECT * FROM table&quot;).then(results =&gt; {
         
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>Bluebird Promise</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
+    <div class="container-returns">
+        <h5>Returns:</h5>
         
+                
+
+
+
 <span class="param-type">Promise</span>
 
 
 
-    </dd>
+
+
+- <p>Bluebird Promise</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dl>
 
-
-        
 
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">postgoose.runOnce({
-  &quot;host&quot;     : &quot;localhost&quot;,
-  &quot;port&quot;     : 5432,
-  &quot;database&quot; : &quot;database_name&quot;,
-  &quot;user&quot;     : &quot;johndoe&quot;,
-  &quot;password&quot; : &quot;qwerty&quot;
-}, &quot;SELECT id, username, email FROM users WHERE active = t&quot;, (err, results) =&gt; {
+    <pre class="prettyprint"><code>postgoose.runOnce({
+  "host"     : "localhost",
+  "port"     : 5432,
+  "database" : "database_name",
+  "user"     : "johndoe",
+  "password" : "qwerty"
+}, "SELECT id, username, email FROM users WHERE active = t", (err, results) => {
    if(err)
      console.trace(err);
 
@@ -933,20 +963,20 @@ postgoose.run(&quot;SELECT * FROM table&quot;).then(results =&gt; {
 
 // Or with promises
 postgoose..runOnce({
-  &quot;host&quot;     : &quot;localhost&quot;,
-  &quot;port&quot;     : 5432,
-  &quot;database&quot; : &quot;database_name&quot;,
-  &quot;user&quot;     : &quot;johndoe&quot;,
-  &quot;password&quot; : &quot;qwerty&quot;
-}, &quot;SELECT * FROM table&quot;).then(results =&gt; {
+  "host"     : "localhost",
+  "port"     : 5432,
+  "database" : "database_name",
+  "user"     : "johndoe",
+  "password" : "qwerty"
+}, "SELECT * FROM table").then(results => {
    console.log(results);
-})</pre>
-
+})</code></pre>
 
     
+
 </dd>
 
-        </dl>
+            </dl>
     
 
     
@@ -959,132 +989,26 @@ postgoose..runOnce({
 
 
 
-		</div>
-	</div>
-
-	<div class="clearfix"></div>
-
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
-	
-
 </div>
-</div>
-
-
-    <div class="modal fade" id="searchResults">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Search results</h4>
-          </div>
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div>
-
 
 <footer>
-
-
-<span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
-	
-		on 2018-03-28T15:41:04+02:00
-	
-	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
-</span>
+    <img class="logo" src="https://raw.githubusercontent.com/aluzed/express-mongoose-rest-list/dev/logo/logo.png" style="width: 119px; height: 46px">
+    <div class="footer-text">Postgoose - Copyright &copy; 2018</div>
 </footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
 
-<script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/toc.js"></script>
+    <script>
+        var id = 'module:Postgoose_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
 
-    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
-
-
-<script>
-$( function () {
-	$( "[id*='$']" ).each( function () {
-		var $this = $( this );
-
-		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-	} );
-
-	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
-		var $this = $( this );
-
-		var example = $this.find( "code" );
-		exampleText = example.html();
-		var lang = /{@lang (.*?)}/.exec( exampleText );
-		if ( lang && lang[1] ) {
-			exampleText = exampleText.replace( lang[0], "" );
-			example.html( exampleText );
-			lang = lang[1];
-		} else {
-			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
-			lang = langClassMatch ? langClassMatch[1] : "javascript";
-		}
-
-		if ( lang ) {
-
-			$this
-			.addClass( "sunlight-highlight-" + lang )
-			.addClass( "linenums" )
-			.html( example.html() );
-
-		}
-	} );
-
-	Sunlight.highlightAll( {
-		lineNumbers : false,
-		showMenu : true,
-		enableDoclinks : true
-	} );
-
-	$.catchAnchorLinks( {
-        navbarOffset: 10
-	} );
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
-		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
-		showAndHide : false,
-		smoothScrolling: true
-	} );
-
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-
-    $( "table" ).each( function () {
-      var $this = $( this );
-      $this.addClass('table');
-    } );
-
-} );
-</script>
-
-
-
-<!--Navigation and Symbol Display-->
-
-
-<!--Google Analytics-->
-
-
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            SearcherDisplay.init();
-        });
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
     </script>
-
 
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Home | Rest List</title>
+    <title>Tutorial: insert | Rest List</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -45,28 +45,114 @@
 <div class="main" id="main">
     
 
+<section>
+    <header>
+        
 
-
-    
-
-
-
-
-
-
-
-
+        <h2>insert</h2>
+    </header>
 
     
+        <article class="readme">
+            <h2>Insert</h2><h3>From Static Method</h3><pre class="prettyprint source lang-javascript"><code>const postgoose = require('postgoose');
+const People = postgoose.model('People');
+
+// With Promise
+People.create({
+  name: 'John Doe',
+  details: 'User 1',
+  age: 40
+}).then(people => {
+  console.log(people);
+}).catch(err => {
+  console.error(err.message);
+})
+
+// With callback
+People.create({
+  name: 'John Doe',
+  details: 'User 1',
+  age: 40
+}, (err, people) => {
+  if(err)
+    console.error(err.message);
+
+  else 
+    console.log(people);
+})</code></pre><h3>From Object</h3><pre class="prettyprint source lang-javascript"><code>const postgoose = require('postgoose');
+const People = postgoose.model('People');
+
+let people = new People({
+  name: 'John Doe',
+  details: 'User 1',
+  age: 40
+});
+
+// With Promise
+people
+  .save()
+  .then(people => {
+    console.log(people);
+  })
+  .catch(err => {
+    console.error(err.message);
+  })
+
+// With callback
+people.save((err, people) => {
+  if(err)
+    console.error(err.message);
+
+  else 
+    console.log(people);
+})</code></pre><h3>Insert Many</h3><pre class="prettyprint source lang-javascript"><code>const postgoose = require('postgoose');
+const People = postgoose.model('People');
+
+const list = [
+  {
+    name: 'John Doe',
+    details: 'User 1',
+    age: 40
+  },
+  {
+    name: 'Jane Doe',
+    details: 'User 2',
+    age: 38
+  },
+  {
+    name: 'Johnny Doe',
+    details: 'User 3',
+    age: 15
+  }
+];
+
+// With Promise
+People
+  .insertMany(list)
+  .then(() => {
+    People
+      .find()
+      .then(people => {
+        console.log(people);
+      })
+  })
+  .catch(err => {
+    console.error(err.message);
+  });
 
 
-    <section>
-        <article class="readme"><h2>Postgoose</h2><p>Mongoose-like postgresql library.</p>
-<h3>How To Use</h3><p><a href="tutorial-how_to_use.html">how_to_use</a></p></article>
-    </section>
+// With callback
+People.insertMany(list, (err, results) => {
+  if(err)
+    console.error(err.message);
 
-
-
+  else
+    console.log(results);
+})
+</code></pre>
+        </article>
+    
+</section>
 
 
 
@@ -82,13 +168,7 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'package:undefined_sub'.replace(/"/g, '_');
-        var selectedApi = document.getElementById(id); // do not use jquery selector
-        var $selectedApi = $(selectedApi);
-
-        $selectedApi.removeClass('hidden');
-        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-        showLnbApi();
+        showLnbExamples();
     </script>
 
 </body>

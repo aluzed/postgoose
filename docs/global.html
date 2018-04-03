@@ -1,145 +1,63 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
-	<title>Postgoose Global</title>
+    <meta charset="utf-8">
+    <title>Global | Rest List</title>
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
 
-	<link type="text/css" rel="stylesheet" href="styles/site.readable.css">
-
+    
+        
+            <link type="text/css" rel="stylesheet" href="style/documentation.css">
+        
+    
 </head>
-
 <body>
-
-<div class="navbar navbar-default navbar-fixed-top ">
-<div class="container">
-	<div class="navbar-header">
-		<a class="navbar-brand" href="index.html">Postgoose</a>
-		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-        </button>
-	</div>
-	<div class="navbar-collapse collapse" id="topNavigation">
-		<ul class="nav navbar-nav">
-			
-			<li class="dropdown">
-				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="module-Core_Model.html">Core/Model</a></li><li><a href="module-Core_PostgooseSchema.html">Core/PostgooseSchema</a></li><li><a href="module-Core_PostgooseSchema_HooksList.html">Core/PostgooseSchema/HooksList</a></li><li><a href="module-Core_PostgooseSchema_Types.html">Core/PostgooseSchema/Types</a></li><li><a href="module-Postgoose.html">Postgoose</a></li><li><a href="module-Queries_Insert.html">Queries/Insert</a></li><li><a href="module-Queries_Query.html">Queries/Query</a></li><li><a href="module-Queries_Remove.html">Queries/Remove</a></li><li><a href="module-Queries_Select.html">Queries/Select</a></li><li><a href="module-Queries_SelectOne.html">Queries/SelectOne</a></li><li><a href="module-Queries_TableExists.html">Queries/TableExists</a></li><li><a href="module-Queries_Update.html">Queries/Update</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="module-Core_Model-PostgooseModel.html">Core/Model~PostgooseModel</a></li><li><a href="module-Core_PostgooseSchema-PostgooseSchema.html">Core/PostgooseSchema~PostgooseSchema</a></li><li><a href="module-Queries_Query-Query.html">Queries/Query~Query</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#connect">connect</a></li><li><a href="global.html#disconnect">disconnect</a></li><li><a href="global.html#getConfig">getConfig</a></li><li><a href="global.html#getConnection">getConnection</a></li><li><a href="global.html#isConnected">isConnected</a></li>
-				</ul>
-			</li>
-			
-		</ul>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="width: 119px; height: 46px">
         
-            <div class="col-sm-3 col-md-3">
-                <form class="navbar-form" role="search">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+            <a href="https://github.com/aluzed/postgoose" rel="noopener noreferrer" target="_blank">
+                <img src="https://raw.githubusercontent.com/aluzed/express-mongoose-rest-list/dev/logo/logo.png" width="100%" height="100%">
+            </a>
         
-	</div>
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">Rest List</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-examples hidden"><h3>Examples</h3><ul><li><a href="tutorial-how_to_use.html">how_to_use</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="how_to_use_sub"></div></li><li><a href="tutorial-insert.html">insert</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="insert_sub"></div></li></ul></div><div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-Postgoose.html">Postgoose</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:Postgoose_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-Postgoose.html#~connect">connect</a></li><li><a href="module-Postgoose.html#~model">model</a></li><li><a href="module-Postgoose.html#~run">run</a></li><li><a href="module-Postgoose.html#~runOnce">runOnce</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Global</h3><ul><li><a href="global.html#connect">connect</a></li><li><a href="global.html#disconnect">disconnect</a></li><li><a href="global.html#getConfig">getConfig</a></li><li><a href="global.html#getConnection">getConnection</a></li><li><a href="global.html#isConnected">isConnected</a></li></ul></div>
+</nav>
+<div id="resizer"></div>
 
-</div>
-</div>
+<div class="main" id="main">
+    
 
 
-<div class="container" id="toc-content">
-<div class="row">
 
-	
-	<div class="col-md-8">
-	
-		<div id="main">
-			
 
-	<h1 class="page-title">Global</h1>
 <section>
 
 <header>
     
-        <h2>
-        
-        </h2>
-        
+        <h2>Global</h2>
     
 </header>
 
-
 <article>
-    <div class="container-overview">
     
-        
-
-        
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-        
-    
-    </div>
 
     
 
@@ -152,82 +70,30 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
 
-        <dl>
-            
-<hr>
-<dt class="name" id="module:Core/PostgooseSchema/Types">
-    <h4 id="module:Core/PostgooseSchema/Types"><span class="type-signature"></span>module:Core/PostgooseSchema/Types<span class="type-signature"></span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>TypesList</p>
-<p>List of types</p>
-<p>JSON Doc: http://clarkdave.net/2013/06/what-can-you-do-with-postgresql-and-json/</p>
-    </div>
-    
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        </dl>
     
 
     
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
-            
-<hr>
+                
+
 <dt>
-    <h4 class="name" id="connect"><span class="type-signature"></span>connect(dbConfig)</h4>
     
+        <h4 class="name" id="connect">
+            
+                <span class="type-signature"></span>connect<span class="signature">(dbConfig)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="connection.js.html">connection.js</a></code>,
+                <code><a href="connection.js.html#line20">line 20</a></code>
+            </div>
+            
+        </h4>
+
+        
     
 </dt>
 <dd>
@@ -243,11 +109,12 @@
     
 
     
+
     
+    <div class="container-params">
         <h5>Parameters:</h5>
         
-
-<table class="params table table-striped">
+<table class="params">
     <thead>
     <tr>
         
@@ -278,7 +145,6 @@
 <span class="param-type">Object</span>
 
 
-
             
             </td>
 
@@ -293,17 +159,25 @@
     </tbody>
 </table>
 
+    </div>
     
 
     
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
 
@@ -313,49 +187,52 @@
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 </dl>
 
 
     
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 </dd>
 
-        
             
-<hr>
+                
+
 <dt>
-    <h4 class="name" id="disconnect"><span class="type-signature"></span>disconnect()</h4>
     
+        <h4 class="name" id="disconnect">
+            
+                <span class="type-signature"></span>disconnect<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="connection.js.html">connection.js</a></code>,
+                <code><a href="connection.js.html#line37">line 37</a></code>
+            </div>
+            
+        </h4>
+
+        
     
 </dt>
 <dd>
@@ -371,47 +248,8 @@
     
 
     
-    
 
     
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
 
     
 
@@ -432,7 +270,6 @@
 <span class="param-type">ConnectionNotInitialized</span>
 
 
-
     
     </div>
 
@@ -442,14 +279,64 @@
     
 
     
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
 </dd>
 
-        
             
-<hr>
+                
+
 <dt>
-    <h4 class="name" id="getConfig"><span class="type-signature"></span>getConfig()</h4>
     
+        <h4 class="name" id="getConfig">
+            
+                <span class="type-signature"></span>getConfig<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="connection.js.html">connection.js</a></code>,
+                <code><a href="connection.js.html#line50">line 50</a></code>
+            </div>
+            
+        </h4>
+
+        
     
 </dt>
 <dd>
@@ -465,47 +352,6 @@
     
 
     
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
 
     
 
@@ -518,36 +364,87 @@
     
 
     
-    <h5>Returns:</h5>
+
     
-            
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
+    <div class="container-returns">
+        <h5>Returns:</h5>
         
+                
+
+
+
 <span class="param-type">Object</span>
 
 
 
-    </dd>
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dl>
 
 
-        
-
     
+
 </dd>
 
-        
             
-<hr>
+                
+
 <dt>
-    <h4 class="name" id="getConnection"><span class="type-signature"></span>getConnection()</h4>
     
+        <h4 class="name" id="getConnection">
+            
+                <span class="type-signature"></span>getConnection<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="connection.js.html">connection.js</a></code>,
+                <code><a href="connection.js.html#line58">line 58</a></code>
+            </div>
+            
+        </h4>
+
+        
     
 </dt>
 <dd>
@@ -563,47 +460,6 @@
     
 
     
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
 
     
 
@@ -616,36 +472,87 @@
     
 
     
-    <h5>Returns:</h5>
+
     
-            
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
+    <div class="container-returns">
+        <h5>Returns:</h5>
         
+                
+
+
+
 <span class="param-type">Object</span>
 
 
 
-    </dd>
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dl>
 
 
-        
-
     
+
 </dd>
 
-        
             
-<hr>
+                
+
 <dt>
-    <h4 class="name" id="isConnected"><span class="type-signature"></span>isConnected()</h4>
     
+        <h4 class="name" id="isConnected">
+            
+                <span class="type-signature"></span>isConnected<span class="signature">()</span><span class="type-signature"> &rarr; {Boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="connection.js.html">connection.js</a></code>,
+                <code><a href="connection.js.html#line12">line 12</a></code>
+            </div>
+            
+        </h4>
+
+        
     
 </dt>
 <dd>
@@ -661,47 +568,6 @@
     
 
     
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
 
     
 
@@ -714,31 +580,70 @@
     
 
     
-    <h5>Returns:</h5>
+
     
-            
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
+    <div class="container-returns">
+        <h5>Returns:</h5>
         
+                
+
+
+
 <span class="param-type">Boolean</span>
 
 
 
-    </dd>
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dl>
 
 
-        
-
     
+
 </dd>
 
-        </dl>
+            </dl>
     
 
     
@@ -751,132 +656,26 @@
 
 
 
-		</div>
-	</div>
-
-	<div class="clearfix"></div>
-
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
-	
-
 </div>
-</div>
-
-
-    <div class="modal fade" id="searchResults">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Search results</h4>
-          </div>
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div>
-
 
 <footer>
-
-
-<span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
-	
-		on 2018-03-28T15:41:04+02:00
-	
-	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
-</span>
+    <img class="logo" src="https://raw.githubusercontent.com/aluzed/express-mongoose-rest-list/dev/logo/logo.png" style="width: 119px; height: 46px">
+    <div class="footer-text">Postgoose - Copyright &copy; 2018</div>
 </footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
 
-<script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/toc.js"></script>
+    <script>
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
 
-    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
-
-
-<script>
-$( function () {
-	$( "[id*='$']" ).each( function () {
-		var $this = $( this );
-
-		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-	} );
-
-	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
-		var $this = $( this );
-
-		var example = $this.find( "code" );
-		exampleText = example.html();
-		var lang = /{@lang (.*?)}/.exec( exampleText );
-		if ( lang && lang[1] ) {
-			exampleText = exampleText.replace( lang[0], "" );
-			example.html( exampleText );
-			lang = lang[1];
-		} else {
-			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
-			lang = langClassMatch ? langClassMatch[1] : "javascript";
-		}
-
-		if ( lang ) {
-
-			$this
-			.addClass( "sunlight-highlight-" + lang )
-			.addClass( "linenums" )
-			.html( example.html() );
-
-		}
-	} );
-
-	Sunlight.highlightAll( {
-		lineNumbers : false,
-		showMenu : true,
-		enableDoclinks : true
-	} );
-
-	$.catchAnchorLinks( {
-        navbarOffset: 10
-	} );
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
-		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
-		showAndHide : false,
-		smoothScrolling: true
-	} );
-
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-
-    $( "table" ).each( function () {
-      var $this = $( this );
-      $this.addClass('table');
-    } );
-
-} );
-</script>
-
-
-
-<!--Navigation and Symbol Display-->
-
-
-<!--Google Analytics-->
-
-
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            SearcherDisplay.init();
-        });
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
     </script>
-
 
 </body>
 </html>
